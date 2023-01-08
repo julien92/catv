@@ -1,8 +1,15 @@
 import axios from "axios";
 
-const FIELDS = ["target", "amount", "timestamp"].join(",");
+const DEPTH = 4;
+const LIMIT = 10;
 
-interface Transaction {
+interface TransactionIn {
+  sender: { address: string; alias?: string };
+  amount: number;
+  timestamp: string;
+}
+
+interface TransactionOut {
   target: { address: string; alias?: string };
   amount: number;
   timestamp: string;
@@ -11,42 +18,92 @@ interface Transaction {
 interface Node {
   address: string;
   alias?: string;
-  //   senders: Node[];
+  senders: Node[];
   targets: Node[];
 }
 
-async function fetchTransactions(address: string, from: Date, to: Date) {
-  const { data } = await axios.get<Transaction[]>(
-    `https://api.tzkt.io/v1/operations/transactions/?select=${FIELDS}&sender=${address}&timestamp.gt=${from.toISOString()}&timestamp.le=${to.toISOString()}&limit=10`
+enum Direction {
+  UP,
+  DOWN,
+  BOTH,
+}
+
+async function fetchTransactionsFrom(
+  addresses: string[],
+  from: Date,
+  to: Date
+) {
+  const FIELDS = ["target", "amount", "timestamp"].join(",");
+  const { data } = await axios.get<TransactionOut[]>(
+    `https://api.tzkt.io/v1/operations/transactions/?select=${FIELDS}&sender.in=${addresses.join(
+      ","
+    )}&timestamp.gt=${from.toISOString()}&timestamp.le=${to.toISOString()}&limit=${LIMIT}`
+  );
+
+  return data;
+}
+
+async function fetchTransactionsTo(addresses: string[], from: Date, to: Date) {
+  const FIELDS = ["sender", "amount", "timestamp"].join(",");
+
+  const { data } = await axios.get<TransactionIn[]>(
+    `https://api.tzkt.io/v1/operations/transactions/?select=${FIELDS}&target.in=${addresses.join(
+      ","
+    )}&timestamp.gt=${from.toISOString()}&timestamp.le=${to.toISOString()}&limit=${LIMIT}`
   );
 
   return data;
 }
 
 export default async function fetchTransactionTree(
-  address: string,
+  addresses: string[],
   from: Date,
   to: Date,
-  count = 4
-): Promise<Node> {
-  if (!count)
-    return {
+  direction = Direction.BOTH,
+  count = DEPTH
+): Promise<Node[]> {
+  if (!count || addresses.length === 0)
+    return addresses.map((address) => ({
       address,
+      senders: [],
       targets: [],
-    };
+    }));
 
-  const transactions = await fetchTransactions(address, from, to);
-  const addresses = transactions.map((t) => t.target.address);
-  const uniqueAddresses = addresses.filter(
-    (address, index) => addresses.indexOf(address) === index
+  const transactionsFrom = await fetchTransactionsFrom(addresses, from, to);
+  const targetAddresses = transactionsFrom.map((t) => t.target.address);
+  const uniqueTargetAddresses = targetAddresses.filter(
+    (address, index) => targetAddresses.indexOf(address) === index
   );
+  const targets =
+    direction !== Direction.UP
+      ? await fetchTransactionTree(
+          uniqueTargetAddresses,
+          from,
+          to,
+          Direction.DOWN,
+          count - 1
+        )
+      : [];
 
-  return {
+  const transactionsTo = await fetchTransactionsTo(addresses, from, to);
+  const senderAddresses = transactionsTo.map((t) => t.sender.address);
+  const uniqueSenderAddresses = senderAddresses.filter(
+    (address, index) => senderAddresses.indexOf(address) === index
+  );
+  const senders =
+    direction !== Direction.DOWN
+      ? await fetchTransactionTree(
+          uniqueSenderAddresses,
+          from,
+          to,
+          Direction.UP,
+          count - 1
+        )
+      : [];
+
+  return addresses.map((address) => ({
     address,
-    targets: await Promise.all(
-      uniqueAddresses.map((address) =>
-        fetchTransactionTree(address, from, to, count - 1)
-      )
-    ),
-  };
+    senders,
+    targets,
+  }));
 }

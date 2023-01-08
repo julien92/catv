@@ -21,9 +21,9 @@ export default function Home() {
     if (validateAddress(walletAddress) !== ValidationResult.VALID) return;
 
     fetchTransactionTree(
-      walletAddress,
-      new Date("2021-10-09T00:00:00Z"),
-      new Date("2021-10-23T00:00:00Z")
+      [walletAddress],
+      new Date("2022-06-01T00:00:00Z"),
+      new Date("2022-06-31T00:00:00Z")
     ).then((response) => {
       console.log(response);
     });
