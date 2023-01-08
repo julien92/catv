@@ -1,13 +1,19 @@
-import Head from 'next/head'
-import { Inter } from '@next/font/google'
-import styles from '../styles/Home.module.css'
-import Criteria from '../components/criteria'
-import Graph from '../components/graph'
-import Transactions from '../components/transactions'
+import Head from "next/head";
+import { Inter } from "@next/font/google";
+import styles from "../styles/Home.module.css";
+import Criteria from "../components/criteria";
+import Graph from "../components/graph";
+import Transactions from "../components/transactions";
+import { useEffect, useState } from "react";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const [walletAddress, setWalletAddress] = useState("");
+  useEffect(() => {
+    console.log("Wallet address", walletAddress);
+  }, [walletAddress]);
+
   return (
     <>
       <Head>
@@ -17,20 +23,16 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <header>
-        <div>
-          header
-        </div>
+        <div>header</div>
       </header>
       <div className={styles.container}>
-        <Criteria/>
-        <Graph/>
-        <Transactions/>
+        <Criteria onChange={setWalletAddress} />
+        <Graph />
+        <Transactions />
       </div>
       <footer>
-        <div>
-          footer
-        </div>
+        <div>footer</div>
       </footer>
     </>
-  )
+  );
 }

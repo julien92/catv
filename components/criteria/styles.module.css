@@ -1,0 +1,8 @@
+.criteria {
+  display: flex;
+  flex-direction: column;
+}
+
+.input {
+  width: 600px;
+}

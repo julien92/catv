@@ -1,8 +1,7 @@
-
 export default function Transactions() {
-    return (
-      <>
+  return (
+    <>
       <div>Transactions</div>
-      </>
-    )
-  }
+    </>
+  );
+}
