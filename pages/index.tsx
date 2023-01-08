@@ -5,6 +5,8 @@ import Criteria from "../components/criteria";
 import Graph from "../components/graph";
 import Transactions from "../components/transactions";
 import { useEffect, useState } from "react";
+import fetchTransactionTree from "../tzkt/fetchTransactionTree";
+import { validateAddress, ValidationResult } from "@taquito/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,6 +14,19 @@ export default function Home() {
   const [walletAddress, setWalletAddress] = useState("");
   useEffect(() => {
     console.log("Wallet address", walletAddress);
+  }, [walletAddress]);
+
+  useEffect(() => {
+    console.log(validateAddress(walletAddress));
+    if (validateAddress(walletAddress) !== ValidationResult.VALID) return;
+
+    fetchTransactionTree(
+      walletAddress,
+      new Date("2021-10-09T00:00:00Z"),
+      new Date("2021-10-23T00:00:00Z")
+    ).then((response) => {
+      console.log(response);
+    });
   }, [walletAddress]);
 
   return (
