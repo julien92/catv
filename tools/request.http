@@ -1,0 +1,18 @@
+
+@wallet = tz1cHbBAVgPSaTZqL3PMBpDPqYg9EdzrWGEM
+@start = 2022-06-01T00:00:00.000
+@end = 2023-01-01T00:00:00.000
+
+curl https://api.tzkt.io/v1/operations/transactions/?\
+sender.in=KT1Ha4yFVeyzw6KRAdkzq6TxDHB97KG4pZe8,KT1EF89rHUm71YoFqUTnc4DjiPUas9HyGWb1,KT1SnUZLQ4gVrQeapUvp6GY9UKKb4gAZJ8D9,KT1NVvPsNDChrLRH5K2cy6Sc9r1uuUwdiZQd,tz1gFFK75dYAEaje2KUTB3Rsyb1dfryRmdnF,KT1P8n2qzJjwMPbHJfi4o8xu6Pe3gaU3u2A3&\
+timestamp.gt={{start}}&\
+timestamp.le={{end}}&\
+limit=10
+###
+
+
+curl https://api.tzkt.io/v1/operations/transactions/?\
+&target.eq={{wallet}}\
+&timestamp.gt={{start}}\
+&timestamp.le={{end}}\
+&limit=10
