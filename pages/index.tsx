@@ -7,27 +7,32 @@ import Transactions from "../components/transactions";
 import { useEffect, useState } from "react";
 import fetchTransactionTree from "../tzkt/fetchTransactionTree";
 import { validateAddress, ValidationResult } from "@taquito/utils";
+import { useRouter } from "next/router";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const [walletAddress, setWalletAddress] = useState("");
-  useEffect(() => {
-    console.log("Wallet address", walletAddress);
-  }, [walletAddress]);
+  const [transactions, setTransactions] = useState(null);
+  const router = useRouter();
+  const { address } = useRouter().query;
 
   useEffect(() => {
-    console.log(validateAddress(walletAddress));
-    if (validateAddress(walletAddress) !== ValidationResult.VALID) return;
+    if (validateAddress(address as string) !== ValidationResult.VALID) return;
 
     fetchTransactionTree(
-      [walletAddress],
-      new Date("2022-06-01T00:00:00Z"),
-      new Date("2022-06-31T00:00:00Z")
-    ).then((response) => {
-      console.log(response);
+      [address as string],
+      new Date("2020-01-01T00:00:00Z"),
+      new Date("2023-01-01T00:00:00Z")
+    ).then((nodes) => {
+      setTransactions(nodes[0]);
     });
-  }, [walletAddress]);
+  }, [address]);
+
+  const handleCriteriaChange = (address: string) => {
+    if (validateAddress(address as string) !== ValidationResult.VALID) return;
+
+    router.push(`/?address=${address}`);
+  };
 
   return (
     <>
@@ -41,8 +46,8 @@ export default function Home() {
         <div>header</div>
       </header>
       <div className={styles.container}>
-        <Criteria onChange={setWalletAddress} />
-        <Graph />
+        <Criteria onChange={handleCriteriaChange} />
+        <Graph node={transactions} />
         <Transactions />
       </div>
       <footer>

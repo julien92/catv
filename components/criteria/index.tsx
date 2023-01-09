@@ -11,6 +11,7 @@ export default function Criteria({ onChange }: Props) {
   const handleOnchange = (event: ChangeEvent<HTMLInputElement>) => {
     onChange(event.target.value);
   };
+
   return (
     <>
       <div className={styles.criteria}>
