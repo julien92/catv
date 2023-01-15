@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const DEPTH = 1;
-const LIMIT = 100;
+const LIMIT = 20;
 
 interface Transaction {
   target: { address: string; alias?: string };
