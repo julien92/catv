@@ -1,24 +1,11 @@
-import SelectInput from "@mui/material/Select/SelectInput";
 import axios from "axios";
 
-const DEPTH = 2;
-const LIMIT = 10;
+const DEPTH = 1;
+const LIMIT = 100;
 
 interface Transaction {
   target: { address: string; alias?: string };
   sender: { address: string; alias?: string };
-  amount: number;
-  timestamp: string;
-}
-
-interface TransactionIn {
-  sender: { address: string; alias?: string };
-  amount: number;
-  timestamp: string;
-}
-
-interface TransactionOut {
-  target: { address: string; alias?: string };
   amount: number;
   timestamp: string;
 }
@@ -31,15 +18,15 @@ export interface Node {
 }
 
 enum Direction {
-  UP,
-  DOWN,
+  IN,
+  OUT,
   BOTH,
 }
 
 async function fetchTransactions(
   addresses: string[],
-  from: Date,
-  to: Date,
+  start: Date,
+  end: Date,
   type: "sender" | "target"
 ) {
   const FIELDS = ["target", "sender", "amount", "timestamp"].join(",");
@@ -48,7 +35,7 @@ async function fetchTransactions(
   for (let address of addresses) {
     if (!address.startsWith("KT1")) {
       const { data } = await axios.get<Transaction[]>(
-        `https://api.tzkt.io/v1/operations/transactions/?select=${FIELDS}&${type}=${address}&timestamp.gt=${from.toISOString()}&timestamp.le=${to.toISOString()}&limit=${LIMIT}`
+        `https://api.tzkt.io/v1/operations/transactions/?select=${FIELDS}&${type}=${address}&timestamp.gt=${start.toISOString()}&timestamp.le=${end.toISOString()}&limit=${LIMIT}`
       );
       await sleep(50);
 
@@ -63,68 +50,78 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// async function fetchTransactionsTo(addresses: string[], from: Date, to: Date) {
-//   const FIELDS = ["sender", "amount", "timestamp"].join(",");
+async function fetchUniqueAddresses(
+  addresses: string[],
+  start: Date,
+  end: Date,
+  direction: Direction.IN | Direction.OUT
+) {
+  const transactions = await fetchTransactions(
+    addresses,
+    start,
+    end,
+    direction === Direction.IN ? "target" : "sender"
+  );
+  const txAddresses = transactions.map((t) =>
+    direction === Direction.IN ? t.sender.address : t.target.address
+  );
+  return txAddresses.filter(
+    (address, index) => txAddresses.indexOf(address) === index
+  );
+}
 
-//   const promises = addresses.map((address) => {
-//     return axios.get<TransactionOut[]>(
-//       `https://api.tzkt.io/v1/operations/transactions/?select=${FIELDS}&target.eq=${address}&timestamp.gt=${from.toISOString()}&timestamp.le=${to.toISOString()}&limit=${LIMIT}`
-//     );
-//   });
+async function fetchChildTransactions(
+  addresses: string[],
+  start: Date,
+  end: Date,
+  direction: Direction.IN | Direction.OUT,
+  count = DEPTH
+) {
+  if (count < 0) return [];
 
-//   return await Promise.all(promises);
-// }
+  const uniqueAddresses = await fetchUniqueAddresses(
+    addresses,
+    start,
+    end,
+    direction
+  );
+
+  const children = await fetchChildTransactions(
+    uniqueAddresses,
+    start,
+    end,
+    direction,
+    count - 1
+  );
+
+  return uniqueAddresses.map((address) => ({
+    address,
+    senders: direction === Direction.IN ? children : [],
+    targets: direction === Direction.OUT ? children : [],
+  }));
+}
 
 export default async function fetchTransactionTree(
   addresses: string[],
-  from: Date,
-  to: Date,
-  direction = Direction.BOTH,
-  count = DEPTH
+  start: Date,
+  end: Date,
+  depth = DEPTH
 ): Promise<Node[]> {
-  if (!count || addresses.length === 0)
-    return addresses.map((address) => ({
-      address,
-      senders: [],
-      targets: [],
-    }));
-
-  const transactionsFrom = await fetchTransactions(
+  const targets = await fetchChildTransactions(
     addresses,
-    from,
-    to,
-    "sender"
+    start,
+    end,
+    Direction.OUT,
+    depth - 1
   );
-  const targetAddresses = transactionsFrom.map((t) => t.target.address);
-  const uniqueTargetAddresses = targetAddresses.filter(
-    (address, index) => targetAddresses.indexOf(address) === index
-  );
-  const targets =
-    direction !== Direction.UP
-      ? await fetchTransactionTree(
-          uniqueTargetAddresses,
-          from,
-          to,
-          Direction.DOWN,
-          count - 1
-        )
-      : [];
 
-  const transactionsTo = await fetchTransactions(addresses, from, to, "target");
-  const senderAddresses = transactionsTo.map((t) => t.sender.address);
-  const uniqueSenderAddresses = senderAddresses.filter(
-    (address, index) => senderAddresses.indexOf(address) === index
+  const senders = await fetchChildTransactions(
+    addresses,
+    start,
+    end,
+    Direction.IN,
+    depth - 1
   );
-  const senders =
-    direction !== Direction.DOWN
-      ? await fetchTransactionTree(
-          uniqueSenderAddresses,
-          from,
-          to,
-          Direction.UP,
-          count - 1
-        )
-      : [];
 
   return addresses.map((address) => ({
     address,

@@ -1,15 +1,32 @@
-import { Input } from "@mui/material";
+import {
+  FormControl,
+  Input,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from "@mui/material";
 import { ChangeEvent } from "react";
 
 import styles from "./styles.module.css";
 
-interface Props {
-  onChange: (value: string) => void;
+export interface CriteriaValue {
+  address: string;
+  depth: number;
 }
 
-export default function Criteria({ onChange }: Props) {
-  const handleOnchange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange(event.target.value);
+interface Props {
+  value: CriteriaValue;
+  onChange: (value: CriteriaValue) => void;
+}
+
+export default function Criteria({ value, onChange }: Props) {
+  const handleAddressChange = (event: ChangeEvent<HTMLInputElement>) => {
+    onChange({ ...value, address: event.target.value });
+  };
+
+  const handleDepthChange = (event: SelectChangeEvent<number>) => {
+    onChange({ ...value, depth: event.target.value as number });
   };
 
   return (
@@ -19,8 +36,21 @@ export default function Criteria({ onChange }: Props) {
           <Input
             placeholder="Wallet address"
             fullWidth
-            onChange={handleOnchange}
+            value={value.address}
+            onChange={handleAddressChange}
           />
+          <FormControl fullWidth>
+            <InputLabel>Depth</InputLabel>
+            <Select
+              value={value.depth}
+              label="Depth"
+              onChange={handleDepthChange}
+            >
+              <MenuItem value={1}>1</MenuItem>
+              <MenuItem value={2}>2</MenuItem>
+              <MenuItem value={3}>3</MenuItem>
+            </Select>
+          </FormControl>
         </div>
       </div>
     </>

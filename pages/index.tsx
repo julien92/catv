@@ -1,10 +1,10 @@
 import Head from "next/head";
 import { Inter } from "@next/font/google";
 import styles from "../styles/Home.module.css";
-import Criteria from "../components/criteria";
+import Criteria, { CriteriaValue } from "../components/criteria";
 import Graph from "../components/graph";
 import Transactions from "../components/transactions";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import fetchTransactionTree from "../tzkt/fetchTransactionTree";
 import { validateAddress, ValidationResult } from "@taquito/utils";
 import { useRouter } from "next/router";
@@ -14,24 +14,35 @@ const inter = Inter({ subsets: ["latin"] });
 export default function Home() {
   const [transactions, setTransactions] = useState(null);
   const router = useRouter();
-  const { address } = useRouter().query;
+  const { address, depth } = useRouter().query;
+  const criteria = useMemo(
+    () => ({
+      address: (address as string) || "",
+      depth: parseInt(depth as string) || 1,
+    }),
+    [address, depth]
+  );
 
   useEffect(() => {
     if (validateAddress(address as string) !== ValidationResult.VALID) return;
+    const _depth = parseInt(depth as string);
+    if (_depth < 1 || _depth > 10) return;
 
     fetchTransactionTree(
       [address as string],
       new Date("2020-01-01T00:00:00Z"),
-      new Date("2023-01-01T00:00:00Z")
+      new Date("2023-01-01T00:00:00Z"),
+      _depth
     ).then((nodes) => {
       setTransactions(nodes[0]);
     });
-  }, [address]);
+  }, [address, depth]);
 
-  const handleCriteriaChange = (address: string) => {
+  const handleCriteriaChange = ({ address, depth }: CriteriaValue) => {
     if (validateAddress(address as string) !== ValidationResult.VALID) return;
+    if (depth < 0 || depth > 10) return;
 
-    router.push(`/?address=${address}`);
+    router.push(`/?address=${address}&depth=${depth}`);
   };
 
   return (
@@ -46,7 +57,7 @@ export default function Home() {
         <div>header</div>
       </header>
       <div className={styles.container}>
-        <Criteria onChange={handleCriteriaChange} />
+        <Criteria value={criteria} onChange={handleCriteriaChange} />
         <Graph node={transactions} />
         <Transactions />
       </div>
