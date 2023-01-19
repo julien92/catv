@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import fetchTransactionTree from "../tzkt/fetchTransactionTree";
 import { validateAddress, ValidationResult } from "@taquito/utils";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -54,15 +55,19 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <header>
-        <div>header</div>
+        <div className={styles.header}>
+          <Image src="tezos_logo.svg" alt="logo" width={60} height={60} />
+          <div className={styles.separator}>-</div>
+          <div>CATV</div>
+        </div>
       </header>
       <div className={styles.container}>
         <Criteria value={criteria} onChange={handleCriteriaChange} />
         <Graph node={transactions} />
         <Transactions />
       </div>
-      <footer>
-        <div>footer</div>
+      <footer className={styles.footer}>
+        <div />
       </footer>
     </>
   );
