@@ -32,14 +32,16 @@ export default function Criteria({ value, onChange }: Props) {
   return (
     <>
       <div className={styles.criteria}>
-        <div className={styles.input}>
+        <div className={styles.wallet}>
           <Input
             placeholder="Wallet address"
             fullWidth
             value={value.address}
             onChange={handleAddressChange}
           />
-          <FormControl fullWidth>
+        </div>
+        <div className={styles.depth}>
+          <FormControl>
             <InputLabel>Depth</InputLabel>
             <Select
               value={value.depth}

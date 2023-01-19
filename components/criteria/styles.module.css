@@ -1,8 +1,13 @@
 .criteria {
+  margin-top: 30px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 
-.input {
+.wallet {
   width: 600px;
+}
+
+.depth {
+  margin-left: 8px;
 }
