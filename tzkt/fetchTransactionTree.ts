@@ -2,17 +2,21 @@ import axios from "axios";
 
 const DEPTH = 1;
 const LIMIT = 20;
-
-interface Transaction {
-  target: { address: string; alias?: string };
-  sender: { address: string; alias?: string };
+const exchangeAliases = ["Binance withdrawal"];
+export interface Transaction {
+  target: Wallet;
+  sender: Wallet;
   amount: number;
   timestamp: string;
 }
 
-export interface Node {
+export interface Wallet {
   address: string;
-  alias?: string;
+  alias: string;
+}
+
+export interface Node {
+  wallet: Wallet;
   senders: Node[];
   targets: Node[];
 }
@@ -24,7 +28,7 @@ enum Direction {
 }
 
 async function fetchTransactions(
-  addresses: string[],
+  wallets: Wallet[],
   start: Date,
   end: Date,
   type: "sender" | "target"
@@ -32,10 +36,12 @@ async function fetchTransactions(
   const FIELDS = ["target", "sender", "amount", "timestamp"].join(",");
   let results = [];
 
-  for (let address of addresses) {
-    if (!address.startsWith("KT1")) {
+  for (let wallet of wallets) {
+    if (isUserWallet(wallet)) {
       const { data } = await axios.get<Transaction[]>(
-        `https://api.tzkt.io/v1/operations/transactions/?select=${FIELDS}&${type}=${address}&timestamp.gt=${start.toISOString()}&timestamp.le=${end.toISOString()}&limit=${LIMIT}`
+        `https://api.tzkt.io/v1/operations/transactions/?select=${FIELDS}&${type}=${
+          wallet.address
+        }&timestamp.gt=${start.toISOString()}&timestamp.le=${end.toISOString()}&limit=${LIMIT}`
       );
       await sleep(50);
 
@@ -46,69 +52,75 @@ async function fetchTransactions(
   return results;
 }
 
+function isUserWallet(wallet: Wallet) {
+  const address = wallet.address;
+  const isUserWallet = !(
+    wallet.address.startsWith("KT1") || exchangeAliases.includes(wallet.alias)
+  );
+  return isUserWallet;
+}
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function fetchUniqueAddresses(
-  addresses: string[],
+async function fetchUniqueWallet(
+  wallets: Wallet[],
   start: Date,
   end: Date,
   direction: Direction.IN | Direction.OUT
-) {
+): Promise<Wallet[]> {
   const transactions = await fetchTransactions(
-    addresses,
+    wallets,
     start,
     end,
     direction === Direction.IN ? "target" : "sender"
   );
-  const txAddresses = transactions.map((t) =>
-    direction === Direction.IN ? t.sender.address : t.target.address
+
+  const recipients: Wallet[] = transactions.map((t) =>
+    direction === Direction.IN ? t.sender : t.target
   );
-  return txAddresses.filter(
-    (address, index) => txAddresses.indexOf(address) === index
+
+  const walletAddresses = recipients.map((transaction) => transaction.address);
+  return recipients.filter(
+    ({ address }, index) => !walletAddresses.includes(address, index + 1)
   );
 }
 
 async function fetchChildTransactions(
-  addresses: string[],
+  wallets: Wallet[],
   start: Date,
   end: Date,
   direction: Direction.IN | Direction.OUT,
   count = DEPTH
-) {
+): Promise<Node[]> {
   if (count < 0) return [];
 
-  const uniqueAddresses = await fetchUniqueAddresses(
-    addresses,
-    start,
-    end,
-    direction
-  );
+  const uniqueWallets = await fetchUniqueWallet(wallets, start, end, direction);
 
   const children = await fetchChildTransactions(
-    uniqueAddresses,
+    uniqueWallets,
     start,
     end,
     direction,
     count - 1
   );
 
-  return uniqueAddresses.map((address) => ({
-    address,
+  return uniqueWallets.map((wallet) => ({
+    wallet,
     senders: direction === Direction.IN ? children : [],
     targets: direction === Direction.OUT ? children : [],
   }));
 }
 
 export default async function fetchTransactionTree(
-  addresses: string[],
+  wallets: Wallet[],
   start: Date,
   end: Date,
   depth = DEPTH
 ): Promise<Node[]> {
   const targets = await fetchChildTransactions(
-    addresses,
+    wallets,
     start,
     end,
     Direction.OUT,
@@ -116,15 +128,15 @@ export default async function fetchTransactionTree(
   );
 
   const senders = await fetchChildTransactions(
-    addresses,
+    wallets,
     start,
     end,
     Direction.IN,
     depth - 1
   );
 
-  return addresses.map((address) => ({
-    address,
+  return wallets.map((wallet) => ({
+    wallet,
     senders,
     targets,
   }));

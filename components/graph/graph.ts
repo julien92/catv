@@ -19,14 +19,14 @@ export const buildGraph = (
   graph: Graph = { nodes: [], links: [] }
 ) => {
   let nodeGraph = graph.nodes.filter(
-    (nodeGraph) => nodeGraph.id == node.address
+    (nodeGraph) => nodeGraph.id == node.wallet.address
   )[0];
 
   if (nodeGraph) {
-    nodeGraph.val += nodeGraph.val;
+    nodeGraph.val += 1;
   } else {
     nodeGraph = {
-      id: node.address,
+      id: node.wallet.address,
       val: 1,
     };
     graph.nodes.push(nodeGraph);
@@ -37,8 +37,8 @@ export const buildGraph = (
   if (node.senders) {
     senderLinks = node.senders.map((sender) => {
       return {
-        source: sender.address,
-        target: node.address,
+        source: sender.wallet.address,
+        target: node.wallet.address,
       };
     });
   }
@@ -46,8 +46,8 @@ export const buildGraph = (
   if (node.targets) {
     targetLinks = node.targets.map((target) => {
       return {
-        source: node.address,
-        target: target.address,
+        source: node.wallet.address,
+        target: target.wallet.address,
       };
     });
   }
