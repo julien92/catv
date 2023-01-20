@@ -4,8 +4,9 @@ import styles from "../styles/Home.module.css";
 import Criteria, { CriteriaValue } from "../components/criteria";
 import Graph from "../components/graph";
 import Transactions from "../components/transactions";
+
 import { useEffect, useMemo, useState } from "react";
-import fetchTransactionTree from "../tzkt/fetchTransactionTree";
+import fetchTransactionTree, { Wallet } from "../tzkt/fetchTransactionTree";
 import { validateAddress, ValidationResult } from "@taquito/utils";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -30,7 +31,7 @@ export default function Home() {
     if (_depth < 1 || _depth > 10) return;
 
     fetchTransactionTree(
-      [address as string],
+      [{ address: address } as Wallet],
       new Date("2020-01-01T00:00:00Z"),
       new Date("2023-01-01T00:00:00Z"),
       _depth
