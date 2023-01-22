@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { Node } from "../../tzkt/fetchTransactionTree";
 import { buildGraph, Graph } from "./graph";
 
+import styles from "./styles.module.css";
+
 const ForceGraph2D = dynamic(
   () => import("react-force-graph").then((mod) => mod.ForceGraph2D),
   { ssr: false }
@@ -29,11 +31,14 @@ export default function Graphs({ node }: Props) {
 
   return (
     <>
-      <div>
+      <div className={styles.graph}>
         <ForceGraph2D
           graphData={graph}
           nodeId="id"
           nodeLabel="id"
+          width={1200}
+          height={600}
+          backgroundColor="#9b9b9b"
           linkDirectionalArrowLength={4}
           linkDirectionalArrowRelPos={1}
           linkWidth={2}
