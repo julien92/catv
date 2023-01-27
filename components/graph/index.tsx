@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { Node, Transaction } from "../../tzkt/fetchTransactionTree";
+import { Transaction } from "../../tzkt/fetchTransactionTree";
 import { buildGraph, Graph } from "./graph";
 
 import styles from "./styles.module.css";
@@ -22,13 +22,10 @@ interface Props {
 export default function Graphs({ transactions }: Props) {
   const [graph, setGraph] = useState<Graph>({ nodes: [], links: [] });
   useEffect(() => {
-    console.log("graph transact", transactions);
     if (!transactions) return;
 
     setGraph(buildGraph(transactions));
   }, [transactions]);
-
-  useEffect(() => console.log(graph), [graph]);
 
   return (
     <>
@@ -43,6 +40,25 @@ export default function Graphs({ transactions }: Props) {
           linkDirectionalArrowLength={4}
           linkDirectionalArrowRelPos={1}
           linkWidth={2}
+          nodeCanvasObject={(
+            node: any,
+            canvasContext: CanvasRenderingContext2D
+          ) => {
+            const image = new Image();
+            image.src = `https://services.tzkt.io/v1/avatars/${node.id}`;
+
+            canvasContext.save();
+            canvasContext.beginPath();
+            canvasContext.arc(node.x, node.y, 4, 0, Math.PI * 2, true);
+            canvasContext.closePath();
+            canvasContext.clip();
+
+            canvasContext.fillStyle = "#666666";
+            canvasContext.fillRect(node.x - 4, node.y - 4, 8, 8);
+
+            canvasContext.fillStyle = "transparent";
+            canvasContext.drawImage(image, node.x - 4, node.y - 4, 8, 8);
+          }}
         />
       </div>
     </>
