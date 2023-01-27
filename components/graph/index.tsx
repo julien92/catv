@@ -22,6 +22,7 @@ interface Props {
 export default function Graphs({ transactions }: Props) {
   const [graph, setGraph] = useState<Graph>({ nodes: [], links: [] });
   useEffect(() => {
+    console.log("graph transact", transactions);
     if (!transactions) return;
 
     setGraph(buildGraph(transactions));

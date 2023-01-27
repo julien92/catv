@@ -65,7 +65,7 @@ export default function Home() {
       <div className={styles.container}>
         <Criteria value={criteria} onChange={handleCriteriaChange} />
         <Graph transactions={transactions} />
-        <Transactions />
+        <Transactions transactions={transactions} />
       </div>
       <footer className={styles.footer}>
         <div />
