@@ -5,9 +5,10 @@ interface Props {
 }
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
+import { Hash } from "crypto";
 
 const columns: GridColDef[] = [
-  { field: "id", headerName: "Transaction", width: 150 },
+  { field: "hash", headerName: "Transaction", width: 150 },
   { field: "sender", headerName: "From", width: 335 },
   { field: "target", headerName: "To", width: 335 },
   { field: "time", headerName: "Time", width: 200 },
@@ -15,6 +16,7 @@ const columns: GridColDef[] = [
 
 interface Rows {
   id: string;
+  hash: string;
   sender: string;
   target: string;
   time: string;
@@ -39,17 +41,24 @@ export default function Transactions({ transactions }: Props) {
           columns={columns}
           pageSize={5}
           rowsPerPageOptions={[5]}
+          onCellDoubleClick={onDoubleClick}
         />
       </div>
     </>
   );
 }
 
+const onDoubleClick = (event) => {
+  const row = event.row;
+  window.open(`https://tzkt.io/${row.hash}`, "_blank");
+};
+
 function buildRows(transactions: Transaction[]): Rows[] {
   console.log("build rows", transactions);
   return transactions.map((transaction) => {
     return {
-      id: transaction.hash,
+      id: transaction.id,
+      hash: transaction.hash,
       sender: transaction.sender.address,
       target: transaction.target.address,
       time: transaction.timestamp,
