@@ -1,4 +1,4 @@
-import { Node } from "../../tzkt/fetchTransactionTree";
+import { Node, Transaction } from "../../tzkt/fetchTransactionTree";
 
 export interface NodeGraph {
   id: string;
@@ -14,57 +14,29 @@ export interface Graph {
   links: Link[];
 }
 
-export const buildGraph = (
-  node: Node,
-  graph: Graph = { nodes: [], links: [] }
-) => {
-  let nodeGraph = graph.nodes.filter(
-    (nodeGraph) => nodeGraph.id == node.wallet.address
-  )[0];
+export const buildGraph = (transactions: Transaction[]) => {
+  const uniqueSenderAdress = transactions.map((t) => t.sender.address);
 
-  if (nodeGraph) {
-    nodeGraph.val += 1;
-  } else {
-    nodeGraph = {
-      id: node.wallet.address,
-      val: 1,
-    };
-    graph.nodes.push(nodeGraph);
-  }
+  const uniqueTargetAdress = transactions.map((t) => t.target.address);
 
-  let senderLinks = [];
-  let targetLinks = [];
-  if (node.senders) {
-    senderLinks = node.senders.map((sender) => {
-      return {
-        source: sender.wallet.address,
-        target: node.wallet.address,
-      };
-    });
-  }
+  const nodes = removeDuplicate(
+    uniqueSenderAdress.concat(uniqueTargetAdress)
+  ).map((address) => {
+    return { id: address, val: 1 };
+  });
 
-  if (node.targets) {
-    targetLinks = node.targets.map((target) => {
-      return {
-        source: node.wallet.address,
-        target: target.wallet.address,
-      };
-    });
-  }
+  const links = transactions.map((t) => {
+    return { source: t.sender.address, target: t.target.address };
+  });
 
-  graph.links = graph.links.concat(senderLinks).concat(targetLinks);
-
-  if (node.senders) {
-    node.senders.forEach((sender) => {
-      buildGraph(sender, graph);
-    });
-  }
-
-  if (node.targets) {
-    node.targets.forEach((target) => {
-      buildGraph(target, graph);
-    });
-  }
-
-  return graph;
+  return {
+    nodes,
+    links,
+  };
 };
+
+function removeDuplicate(address: string[]) {
+  return address.filter(
+    (addr, index, a) => a.findIndex((addr2) => addr2 === addr) === index
+  );
+}
