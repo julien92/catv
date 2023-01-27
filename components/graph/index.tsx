@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { Node } from "../../tzkt/fetchTransactionTree";
+import { Node, Transaction } from "../../tzkt/fetchTransactionTree";
 import { buildGraph, Graph } from "./graph";
 
 import styles from "./styles.module.css";
@@ -16,16 +16,16 @@ const ForceGraph3D = dynamic(
 );
 
 interface Props {
-  node: Node;
+  transactions: Transaction[];
 }
 
-export default function Graphs({ node }: Props) {
+export default function Graphs({ transactions }: Props) {
   const [graph, setGraph] = useState<Graph>({ nodes: [], links: [] });
   useEffect(() => {
-    if (!node) return;
+    if (!transactions) return;
 
-    setGraph(buildGraph(node));
-  }, [node]);
+    setGraph(buildGraph(transactions));
+  }, [transactions]);
 
   useEffect(() => console.log(graph), [graph]);
 

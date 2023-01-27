@@ -4,6 +4,7 @@ const DEPTH = 1;
 const LIMIT = 20;
 const exchangeAliases = ["Binance withdrawal"];
 export interface Transaction {
+  id: string;
   target: Wallet;
   sender: Wallet;
   amount: number;
@@ -29,22 +30,25 @@ enum Direction {
 
 async function fetchTransactions(
   wallets: Wallet[],
+  transactions: Transaction[],
   start: Date,
   end: Date,
   type: "sender" | "target"
 ) {
-  const FIELDS = ["target", "sender", "amount", "timestamp"].join(",");
   let results = [];
 
   for (let wallet of wallets) {
     if (isUserWallet(wallet)) {
       const { data } = await axios.get<Transaction[]>(
-        `https://api.tzkt.io/v1/operations/transactions/?select=${FIELDS}&${type}=${
+        `https://api.tzkt.io/v1/operations/transactions/?${type}=${
           wallet.address
         }&timestamp.gt=${start.toISOString()}&timestamp.le=${end.toISOString()}&limit=${LIMIT}`
       );
       await sleep(50);
 
+      data.forEach((tx) => {
+        transactions.push(tx);
+      });
       results = results.concat(data);
     }
   }
@@ -66,18 +70,20 @@ function sleep(ms) {
 
 async function fetchUniqueWallet(
   wallets: Wallet[],
+  transactions: Transaction[],
   start: Date,
   end: Date,
   direction: Direction.IN | Direction.OUT
 ): Promise<Wallet[]> {
-  const transactions = await fetchTransactions(
+  const tx = await fetchTransactions(
     wallets,
+    transactions,
     start,
     end,
     direction === Direction.IN ? "target" : "sender"
   );
 
-  const recipients: Wallet[] = transactions.map((t) =>
+  const recipients: Wallet[] = tx.map((t) =>
     direction === Direction.IN ? t.sender : t.target
   );
 
@@ -89,6 +95,7 @@ async function fetchUniqueWallet(
 
 async function fetchChildTransactions(
   wallets: Wallet[],
+  transactions: Transaction[],
   start: Date,
   end: Date,
   direction: Direction.IN | Direction.OUT,
@@ -96,10 +103,17 @@ async function fetchChildTransactions(
 ): Promise<Node[]> {
   if (count < 0) return [];
 
-  const uniqueWallets = await fetchUniqueWallet(wallets, start, end, direction);
+  const uniqueWallets = await fetchUniqueWallet(
+    wallets,
+    transactions,
+    start,
+    end,
+    direction
+  );
 
   const children = await fetchChildTransactions(
     uniqueWallets,
+    transactions,
     start,
     end,
     direction,
@@ -118,9 +132,11 @@ export default async function fetchTransactionTree(
   start: Date,
   end: Date,
   depth = DEPTH
-): Promise<Node[]> {
+): Promise<Transaction[]> {
+  const transactions = [];
   const targets = await fetchChildTransactions(
     wallets,
+    transactions,
     start,
     end,
     Direction.OUT,
@@ -129,15 +145,17 @@ export default async function fetchTransactionTree(
 
   const senders = await fetchChildTransactions(
     wallets,
+    transactions,
     start,
     end,
     Direction.IN,
     depth - 1
   );
 
-  return wallets.map((wallet) => ({
-    wallet,
-    senders,
-    targets,
-  }));
+  const uniqueTx = transactions.filter(
+    (t1, i, a) => a.findIndex((t2) => t2.id === t1.id) === i
+  );
+
+  console.log("transactions here", uniqueTx);
+  return uniqueTx;
 }

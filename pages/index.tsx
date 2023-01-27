@@ -14,7 +14,7 @@ import Image from "next/image";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const [transactions, setTransactions] = useState(null);
+  const [transactions, setTransactions] = useState([]);
   const router = useRouter();
   const { address, depth } = useRouter().query;
   const criteria = useMemo(
@@ -35,8 +35,8 @@ export default function Home() {
       new Date("2020-01-01T00:00:00Z"),
       new Date("2023-01-01T00:00:00Z"),
       _depth
-    ).then((nodes) => {
-      setTransactions(nodes[0]);
+    ).then((transactions) => {
+      setTransactions(transactions);
     });
   }, [address, depth]);
 
@@ -64,7 +64,7 @@ export default function Home() {
       </header>
       <div className={styles.container}>
         <Criteria value={criteria} onChange={handleCriteriaChange} />
-        <Graph node={transactions} />
+        <Graph transactions={transactions} />
         <Transactions />
       </div>
       <footer className={styles.footer}>
