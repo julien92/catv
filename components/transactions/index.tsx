@@ -39,7 +39,6 @@ export default function Transactions({ transactions }: Props) {
           columns={columns}
           pageSize={5}
           rowsPerPageOptions={[5]}
-          checkboxSelection
         />
       </div>
     </>
@@ -50,7 +49,7 @@ function buildRows(transactions: Transaction[]): Rows[] {
   console.log("build rows", transactions);
   return transactions.map((transaction) => {
     return {
-      id: transaction.id,
+      id: transaction.hash,
       sender: transaction.sender.address,
       target: transaction.target.address,
       time: transaction.timestamp,
