@@ -41,7 +41,6 @@ export default function Home() {
   }, [address, depth]);
 
   const handleCriteriaChange = ({ address, depth }: CriteriaValue) => {
-    if (validateAddress(address as string) !== ValidationResult.VALID) return;
     if (depth < 0 || depth > 10) return;
 
     router.push(`/?address=${address}&depth=${depth}`);
