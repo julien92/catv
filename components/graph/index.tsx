@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { Transaction } from "../../tzkt/fetchTransactionTree";
+import { Transaction, Wallet } from "../../tzkt/fetchTransactionTree";
+import { isUserWallet } from "../../util/tezosUtil";
 import { buildGraph, Graph } from "./graph";
 
 import styles from "./styles.module.css";
@@ -17,6 +18,7 @@ const ForceGraph3D = dynamic(
 
 interface Props {
   transactions: Transaction[];
+  rootAddress: string;
 }
 
 const onNodeClick = (node: any, event: MouseEvent) => {
@@ -41,6 +43,18 @@ const nodeCanvasObject = (
   canvasContext.save();
   canvasContext.beginPath();
   canvasContext.arc(node.x, node.y, 4, 0, Math.PI * 2, true);
+
+  if (node.isRootAddress) {
+    canvasContext.strokeStyle = "#Ffe430";
+    canvasContext.stroke();
+  } else if (node.isSmartContract) {
+    canvasContext.strokeStyle = "#B1ecff";
+    canvasContext.stroke();
+  } else if (node.isExchangeWallet) {
+    canvasContext.strokeStyle = "#Bc2fee";
+    canvasContext.stroke();
+  }
+
   canvasContext.closePath();
   canvasContext.clip();
 
@@ -51,13 +65,13 @@ const nodeCanvasObject = (
   canvasContext.drawImage(image, node.x - 4, node.y - 4, 8, 8);
 };
 
-export default function Graphs({ transactions }: Props) {
+export default function Graphs({ transactions, rootAddress }: Props) {
   const [graph, setGraph] = useState<Graph>({ nodes: [], links: [] });
   useEffect(() => {
     if (!transactions) return;
 
-    setGraph(buildGraph(transactions));
-  }, [transactions]);
+    setGraph(buildGraph(transactions, rootAddress));
+  }, [transactions, rootAddress]);
 
   return (
     <>

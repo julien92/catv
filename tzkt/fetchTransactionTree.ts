@@ -1,15 +1,13 @@
 import axios from "axios";
+import {
+  isExchangeWallet,
+  isSmartContract,
+  isUserWallet,
+} from "../util/tezosUtil";
 
 const DEPTH = 1;
 const LIMIT = 20;
-const exchangeAliases = [
-  "binance",
-  "coinbase",
-  "kucoin",
-  "gate.io",
-  "kraken",
-  "huobi",
-];
+
 export interface Transaction {
   id: string;
   target: Wallet;
@@ -62,18 +60,6 @@ async function fetchTransactions(
   }
 
   return results;
-}
-
-function isUserWallet(wallet: Wallet) {
-  const address = wallet.address;
-  const isUserWallet = !(
-    wallet.address.startsWith("KT1") ||
-    (wallet.alias &&
-      exchangeAliases.find((exchangeAlias) =>
-        wallet.alias.toLowerCase().includes(exchangeAlias)
-      ))
-  );
-  return isUserWallet;
 }
 
 function sleep(ms) {

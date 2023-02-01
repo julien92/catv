@@ -1,4 +1,9 @@
 import { Node, Transaction } from "../../tzkt/fetchTransactionTree";
+import {
+  isExchangeWallet,
+  isSmartContract,
+  isUserWallet,
+} from "../../util/tezosUtil";
 
 export interface NodeGraph {
   id: string;
@@ -15,7 +20,10 @@ export interface Graph {
   links: Link[];
 }
 
-export const buildGraph = (transactions: Transaction[]) => {
+export const buildGraph = (
+  transactions: Transaction[],
+  rootAddress: string
+) => {
   const uniqueSenderAdress = transactions.map((t) => t.sender.address);
   const uniqueTargetAdress = transactions.map((t) => t.target.address);
 
@@ -28,7 +36,17 @@ export const buildGraph = (transactions: Transaction[]) => {
   const nodes = removeDuplicate(
     uniqueSenderAdress.concat(uniqueTargetAdress)
   ).map((address) => {
-    return { id: address, val: 1, alias: aliasByWallet[address] };
+    return {
+      id: address,
+      val: 1,
+      alias: aliasByWallet[address],
+      isRootAddress: address === rootAddress,
+      isSmartContract: isSmartContract(address),
+      isExchangeWallet: isExchangeWallet({
+        address,
+        alias: aliasByWallet[address],
+      }),
+    };
   });
 
   const links = transactions.map((t) => {
