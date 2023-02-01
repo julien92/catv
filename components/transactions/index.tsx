@@ -11,6 +11,7 @@ const columns: GridColDef[] = [
   { field: "sender", headerName: "From", width: 335 },
   { field: "target", headerName: "To", width: 335 },
   { field: "time", headerName: "Time", width: 200 },
+  { field: "amount", headerName: "Amount", width: 100 },
 ];
 
 interface Rows {
@@ -19,6 +20,7 @@ interface Rows {
   sender: string;
   target: string;
   time: string;
+  amount: number;
 }
 
 export default function Transactions({ transactions }: Props) {
@@ -61,10 +63,21 @@ function buildRows(transactions: Transaction[]): Rows[] {
       sender: getAliasIfExist(transaction.sender),
       target: getAliasIfExist(transaction.target),
       time: transaction.timestamp,
+      amount: getAmount(transaction),
     };
   });
 }
 
 const getAliasIfExist = (wallet: Wallet) => {
   return wallet.alias ? wallet.alias : wallet.address;
+};
+
+const getAmount = (transaction: Transaction): number => {
+  let amount = transaction.amount;
+
+  if (amount == 0) {
+    return undefined;
+  }
+
+  return transaction.amount / 1000000;
 };
