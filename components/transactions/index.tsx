@@ -5,7 +5,6 @@ interface Props {
 }
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
-import { Hash } from "crypto";
 
 const columns: GridColDef[] = [
   { field: "hash", headerName: "Transaction", width: 150 },

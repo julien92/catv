@@ -2,7 +2,13 @@ import axios from "axios";
 
 const DEPTH = 1;
 const LIMIT = 20;
-const exchangeAliases = ["Binance withdrawal"];
+const exchangeAliases = [
+  "Binance withdrawal",
+  "Binance",
+  "Kucoin Withdrawal Old",
+  "Kucoin legacy",
+  "Gate.io",
+];
 export interface Transaction {
   id: string;
   target: Wallet;
