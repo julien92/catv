@@ -1,4 +1,4 @@
-import { Transaction } from "../../tzkt/fetchTransactionTree";
+import { Transaction, Wallet } from "../../tzkt/fetchTransactionTree";
 
 interface Props {
   transactions: Transaction[];
@@ -58,9 +58,13 @@ function buildRows(transactions: Transaction[]): Rows[] {
     return {
       id: transaction.id,
       hash: transaction.hash,
-      sender: transaction.sender.address,
-      target: transaction.target.address,
+      sender: getAliasIfExist(transaction.sender),
+      target: getAliasIfExist(transaction.target),
       time: transaction.timestamp,
     };
   });
 }
+
+const getAliasIfExist = (wallet: Wallet) => {
+  return wallet.alias ? wallet.alias : wallet.address;
+};
