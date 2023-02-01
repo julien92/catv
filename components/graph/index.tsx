@@ -23,6 +23,14 @@ const onNodeClick = (node: any, event: MouseEvent) => {
   window.open(`https://tzkt.io/${node.id}`, "_blank");
 };
 
+const nodeLabel = (node: any) => {
+  let label = node.id;
+  if (node.alias) {
+    label = node.alias;
+  }
+  return label;
+};
+
 const nodeCanvasObject = (
   node: any,
   canvasContext: CanvasRenderingContext2D
@@ -57,7 +65,7 @@ export default function Graphs({ transactions }: Props) {
         <ForceGraph2D
           graphData={graph}
           nodeId="id"
-          nodeLabel="id"
+          nodeLabel={nodeLabel}
           width={1200}
           height={600}
           backgroundColor="#9b9b9b"
