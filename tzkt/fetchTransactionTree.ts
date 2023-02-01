@@ -2,13 +2,7 @@ import axios from "axios";
 
 const DEPTH = 1;
 const LIMIT = 20;
-const exchangeAliases = [
-  "Binance withdrawal",
-  "Binance",
-  "Kucoin Withdrawal Old",
-  "Kucoin legacy",
-  "Gate.io",
-];
+const exchangeAliases = ["binance", "coinbase", "kucoin", "gate.io", "kraken"];
 export interface Transaction {
   id: string;
   target: Wallet;
@@ -66,7 +60,11 @@ async function fetchTransactions(
 function isUserWallet(wallet: Wallet) {
   const address = wallet.address;
   const isUserWallet = !(
-    wallet.address.startsWith("KT1") || exchangeAliases.includes(wallet.alias)
+    wallet.address.startsWith("KT1") ||
+    (wallet.alias &&
+      exchangeAliases.find((exchangeAlias) =>
+        wallet.alias.toLowerCase().includes(exchangeAlias)
+      ))
   );
   return isUserWallet;
 }
