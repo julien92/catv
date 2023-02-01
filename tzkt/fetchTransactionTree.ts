@@ -2,7 +2,14 @@ import axios from "axios";
 
 const DEPTH = 1;
 const LIMIT = 20;
-const exchangeAliases = ["binance", "coinbase", "kucoin", "gate.io", "kraken"];
+const exchangeAliases = [
+  "binance",
+  "coinbase",
+  "kucoin",
+  "gate.io",
+  "kraken",
+  "huobi",
+];
 export interface Transaction {
   id: string;
   target: Wallet;
