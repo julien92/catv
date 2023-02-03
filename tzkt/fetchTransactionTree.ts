@@ -1,12 +1,8 @@
 import axios from "axios";
-import {
-  isExchangeWallet,
-  isSmartContract,
-  isUserWallet,
-} from "../util/tezosUtil";
+import { isUserWallet } from "../util/tezosUtil";
 
 const DEPTH = 1;
-const LIMIT = 20;
+const LIMIT = 50;
 
 export interface Transaction {
   id: string;
