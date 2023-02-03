@@ -16,13 +16,14 @@ const inter = Inter({ subsets: ["latin"] });
 export default function Home() {
   const [transactions, setTransactions] = useState([]);
   const router = useRouter();
-  const { address, depth } = useRouter().query;
+  const { address, depth, limit } = useRouter().query;
   const criteria = useMemo(
     () => ({
       address: (address as string) || "",
       depth: parseInt(depth as string) || 1,
+      limit: parseInt(limit as string) || 20,
     }),
-    [address, depth]
+    [address, depth, limit]
   );
 
   useEffect(() => {
@@ -30,20 +31,24 @@ export default function Home() {
     const _depth = parseInt(depth as string);
     if (_depth < 1 || _depth > 10) return;
 
+    const _limit = parseInt(limit as string);
+    if (_limit < 1) return;
+
     fetchTransactionTree(
       [{ address: address } as Wallet],
       new Date("2020-01-01T00:00:00Z"),
       new Date(),
-      _depth
+      _depth,
+      _limit
     ).then((transactions) => {
       setTransactions(transactions);
     });
-  }, [address, depth]);
+  }, [address, depth, limit]);
 
-  const handleCriteriaChange = ({ address, depth }: CriteriaValue) => {
+  const handleCriteriaChange = ({ address, depth, limit }: CriteriaValue) => {
     if (depth < 0 || depth > 10) return;
-
-    router.push(`/?address=${address}&depth=${depth}`);
+    if (limit < 0) return;
+    router.push(`/?address=${address}&depth=${depth}&limit=${limit}`);
   };
 
   return (

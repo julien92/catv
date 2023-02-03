@@ -13,6 +13,7 @@ import styles from "./styles.module.css";
 export interface CriteriaValue {
   address: string;
   depth: number;
+  limit: number;
 }
 
 interface Props {
@@ -29,6 +30,10 @@ export default function Criteria({ value, onChange }: Props) {
     onChange({ ...value, depth: event.target.value as number });
   };
 
+  const handleTxLimitChange = (event: SelectChangeEvent<number>) => {
+    onChange({ ...value, limit: event.target.value as number });
+  };
+
   return (
     <>
       <div className={styles.criteria}>
@@ -40,7 +45,7 @@ export default function Criteria({ value, onChange }: Props) {
             onChange={handleAddressChange}
           />
         </div>
-        <div className={styles.depth}>
+        <div className={styles.select}>
           <FormControl>
             <InputLabel>Depth</InputLabel>
             <Select
@@ -52,6 +57,20 @@ export default function Criteria({ value, onChange }: Props) {
               <MenuItem value={2}>2</MenuItem>
               <MenuItem value={3}>3</MenuItem>
               <MenuItem value={4}>4</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
+        <div className={styles.select}>
+          <FormControl>
+            <InputLabel>Limit</InputLabel>
+            <Select
+              value={value.limit}
+              label="Limit"
+              onChange={handleTxLimitChange}
+            >
+              <MenuItem value={20}>20</MenuItem>
+              <MenuItem value={50}>50</MenuItem>
+              <MenuItem value={100}>100</MenuItem>
             </Select>
           </FormControl>
         </div>

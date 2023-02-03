@@ -2,7 +2,7 @@ import axios from "axios";
 import { isUserWallet } from "../util/tezosUtil";
 
 const DEPTH = 1;
-const LIMIT = 50;
+const LIMIT = 20;
 
 export interface Transaction {
   id: string;
@@ -35,8 +35,10 @@ async function fetchTransactions(
   transactions: Transaction[],
   start: Date,
   end: Date,
-  type: "sender" | "target"
+  type: "sender" | "target",
+  limit: number
 ) {
+  console.log(limit);
   let results = [];
 
   for (let wallet of wallets) {
@@ -44,7 +46,7 @@ async function fetchTransactions(
       const { data } = await axios.get<Transaction[]>(
         `https://api.tzkt.io/v1/operations/transactions/?${type}=${
           wallet.address
-        }&timestamp.gt=${start.toISOString()}&timestamp.le=${end.toISOString()}&limit=${LIMIT}`
+        }&timestamp.gt=${start.toISOString()}&timestamp.le=${end.toISOString()}&limit=${limit}`
       );
       await sleep(50);
 
@@ -67,14 +69,16 @@ async function fetchUniqueWallet(
   transactions: Transaction[],
   start: Date,
   end: Date,
-  direction: Direction.IN | Direction.OUT
+  direction: Direction.IN | Direction.OUT,
+  limit: number
 ): Promise<Wallet[]> {
   const tx = await fetchTransactions(
     wallets,
     transactions,
     start,
     end,
-    direction === Direction.IN ? "target" : "sender"
+    direction === Direction.IN ? "target" : "sender",
+    limit
   );
 
   const recipients: Wallet[] = tx.map((t) =>
@@ -93,7 +97,8 @@ async function fetchChildTransactions(
   start: Date,
   end: Date,
   direction: Direction.IN | Direction.OUT,
-  count = DEPTH
+  count = DEPTH,
+  limit = LIMIT
 ): Promise<Node[]> {
   if (count < 0) return [];
 
@@ -102,7 +107,8 @@ async function fetchChildTransactions(
     transactions,
     start,
     end,
-    direction
+    direction,
+    limit
   );
 
   const children = await fetchChildTransactions(
@@ -111,7 +117,8 @@ async function fetchChildTransactions(
     start,
     end,
     direction,
-    count - 1
+    count - 1,
+    limit
   );
 
   return uniqueWallets.map((wallet) => ({
@@ -125,7 +132,8 @@ export default async function fetchTransactionTree(
   wallets: Wallet[],
   start: Date,
   end: Date,
-  depth = DEPTH
+  depth = DEPTH,
+  limit = LIMIT
 ): Promise<Transaction[]> {
   const transactions = [];
   const targets = await fetchChildTransactions(
@@ -134,7 +142,8 @@ export default async function fetchTransactionTree(
     start,
     end,
     Direction.OUT,
-    depth - 1
+    depth - 1,
+    limit
   );
 
   const senders = await fetchChildTransactions(
@@ -143,7 +152,8 @@ export default async function fetchTransactionTree(
     start,
     end,
     Direction.IN,
-    depth - 1
+    depth - 1,
+    limit
   );
 
   const uniqueTx = transactions.filter(
