@@ -26,7 +26,6 @@ interface Rows {
 export default function Transactions({ transactions }: Props) {
   const [rows, setRows] = useState<Rows[]>([]);
   useEffect(() => {
-    console.log("try to catch change", transactions);
     if (!transactions || transactions.length == 0) return;
 
     if (transactions?.length > 0) {
