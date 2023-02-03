@@ -5,6 +5,8 @@ const exchangeAliases = [
   "gate.io",
   "kraken",
   "huobi",
+  "crypto.com",
+  "bittrex",
 ];
 
 export function isSmartContract(address: string) {
