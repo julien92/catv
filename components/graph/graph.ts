@@ -1,8 +1,8 @@
-import { Node, Transaction } from "../../tzkt/fetchTransactionTree";
+import { Transaction } from "../../model/transaction";
 import {
+  computeWalletType,
   isExchangeWallet,
   isSmartContract,
-  isUserWallet,
 } from "../../util/tezosUtil";
 
 export interface NodeGraph {
@@ -36,16 +36,13 @@ export const buildGraph = (
   const nodes = removeDuplicate(
     uniqueSenderAdress.concat(uniqueTargetAdress)
   ).map((address) => {
+    const alias = aliasByWallet[address];
     return {
       id: address,
       val: 1,
-      alias: aliasByWallet[address],
+      alias,
+      wallletType: computeWalletType({ address, alias }),
       isRootAddress: address === rootAddress,
-      isSmartContract: isSmartContract(address),
-      isExchangeWallet: isExchangeWallet({
-        address,
-        alias: aliasByWallet[address],
-      }),
     };
   });
 

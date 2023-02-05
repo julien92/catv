@@ -1,22 +1,10 @@
 import axios from "axios";
-import { isUserWallet } from "../util/tezosUtil";
+import { Transaction } from "../model/transaction";
+import { Wallet, WalletType } from "../model/wallet";
+import { computeWalletType, isUserWallet } from "../util/tezosUtil";
 
-const DEPTH = 1;
-const LIMIT = 20;
-
-export interface Transaction {
-  id: string;
-  target: Wallet;
-  sender: Wallet;
-  amount: number;
-  timestamp: string;
-  hash: string;
-}
-
-export interface Wallet {
-  address: string;
-  alias: string;
-}
+const DEFAULT_DEPTH = 1;
+const DEFAULT_LIMIT = 20;
 
 export interface Node {
   wallet: Wallet;
@@ -38,7 +26,6 @@ async function fetchTransactions(
   type: "sender" | "target",
   limit: number
 ) {
-  console.log(limit);
   let results = [];
 
   for (let wallet of wallets) {
@@ -48,7 +35,7 @@ async function fetchTransactions(
           wallet.address
         }&timestamp.gt=${start.toISOString()}&timestamp.le=${end.toISOString()}&limit=${limit}`
       );
-      await sleep(50);
+      await sleep(20);
 
       data.forEach((tx) => {
         transactions.push(tx);
@@ -81,12 +68,14 @@ async function fetchUniqueWallet(
     limit
   );
 
-  const recipients: Wallet[] = tx.map((t) =>
+  const walletDiscovered: Wallet[] = tx.map((t) =>
     direction === Direction.IN ? t.sender : t.target
   );
 
-  const walletAddresses = recipients.map((transaction) => transaction.address);
-  return recipients.filter(
+  const walletAddresses = walletDiscovered.map(
+    (transaction) => transaction.address
+  );
+  return walletDiscovered.filter(
     ({ address }, index) => !walletAddresses.includes(address, index + 1)
   );
 }
@@ -97,8 +86,8 @@ async function fetchChildTransactions(
   start: Date,
   end: Date,
   direction: Direction.IN | Direction.OUT,
-  count = DEPTH,
-  limit = LIMIT
+  count,
+  limit
 ): Promise<Node[]> {
   if (count < 0) return [];
 
@@ -132,8 +121,8 @@ export default async function fetchTransactionTree(
   wallets: Wallet[],
   start: Date,
   end: Date,
-  depth = DEPTH,
-  limit = LIMIT
+  depth = DEFAULT_DEPTH,
+  limit = DEFAULT_LIMIT
 ): Promise<Transaction[]> {
   const transactions = [];
   const targets = await fetchChildTransactions(

@@ -1,10 +1,6 @@
-import { Transaction, Wallet } from "../../tzkt/fetchTransactionTree";
-
-interface Props {
-  transactions: Transaction[];
-}
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
+import { Transaction } from "../../model/transaction";
 
 const columns: GridColDef[] = [
   { field: "hash", headerName: "Transaction", width: 150 },
@@ -14,6 +10,9 @@ const columns: GridColDef[] = [
   { field: "amount", headerName: "Amount", width: 100 },
 ];
 
+interface Props {
+  transactions: Transaction[];
+}
 interface Rows {
   id: string;
   hash: string;

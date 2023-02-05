@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { Transaction, Wallet } from "../../tzkt/fetchTransactionTree";
-import { isUserWallet } from "../../util/tezosUtil";
+import { Transaction } from "../../model/transaction";
+import { WalletType } from "../../model/wallet";
 import { buildGraph, Graph } from "./graph";
 
 import styles from "./styles.module.css";
@@ -20,6 +20,11 @@ interface Props {
   transactions: Transaction[];
   rootAddress: string;
 }
+
+const strokeStyleByWalletType: Map<WalletType, string> = new Map([
+  [WalletType.Exchange, "#Bc2fee"],
+  [WalletType.SmartContract, "#B1ecff"],
+]);
 
 const onNodeClick = (node: any, event: MouseEvent) => {
   window.open(`https://tzkt.io/${node.id}`, "_blank");
@@ -44,14 +49,11 @@ const nodeCanvasObject = (
   canvasContext.beginPath();
   canvasContext.arc(node.x, node.y, 4, 0, Math.PI * 2, true);
 
-  if (node.isRootAddress) {
-    canvasContext.strokeStyle = "#Ffe430";
-    canvasContext.stroke();
-  } else if (node.isSmartContract) {
-    canvasContext.strokeStyle = "#B1ecff";
-    canvasContext.stroke();
-  } else if (node.isExchangeWallet) {
-    canvasContext.strokeStyle = "#Bc2fee";
+  const strokeStyle = node.isRootAddress
+    ? "#Ffe430"
+    : strokeStyleByWalletType.get(node.wallletType);
+  if (strokeStyle) {
+    canvasContext.strokeStyle = strokeStyle;
     canvasContext.stroke();
   }
 
