@@ -6,14 +6,14 @@
 }
 
 .addressInput {
-  min-width: 360px;
+  min-width: 360px !important;
 }
 
 .depthSelect,
 .limitSelect {
-  min-width: 96px;
+  min-width: 96px !important;
 }
 
 .dateSelect {
-  min-width: 248px;
+  min-width: 248px !important;
 }
