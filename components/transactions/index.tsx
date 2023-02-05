@@ -1,6 +1,7 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { Transaction } from "../../model/transaction";
+import { Wallet } from "../../model/wallet";
 
 const columns: GridColDef[] = [
   { field: "hash", headerName: "Transaction", width: 150 },

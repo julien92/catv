@@ -6,10 +6,11 @@ import Graph from "../components/graph";
 import Transactions from "../components/transactions";
 
 import { useEffect, useMemo, useState } from "react";
-import fetchTransactionTree, { Wallet } from "../tzkt/fetchTransactionTree";
 import { validateAddress, ValidationResult } from "@taquito/utils";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import fetchTransactionTree from "../tzkt/fetchTransactionTree";
+import { Wallet } from "../model/wallet";
 
 const inter = Inter({ subsets: ["latin"] });
 

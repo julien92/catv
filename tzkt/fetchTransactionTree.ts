@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Transaction } from "../model/transaction";
-import { Wallet, WalletType } from "../model/wallet";
-import { computeWalletType, isUserWallet } from "../util/tezosUtil";
+import { Wallet } from "../model/wallet";
+import { isUserWallet } from "../util/tezosUtil";
 
 const DEFAULT_DEPTH = 1;
 const DEFAULT_LIMIT = 20;
