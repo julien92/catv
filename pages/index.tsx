@@ -73,7 +73,12 @@ export default function Home() {
         <Transactions transactions={transactions} />
       </div>
       <footer className={styles.footer}>
-        <div />
+        <div>
+          Powered by TzKT API{" "}
+          <a href="https://tzkt.io" target="_blank" rel="noreferrer">
+            tzkt.io
+          </a>
+        </div>
       </footer>
     </>
   );

@@ -2,6 +2,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { Transaction } from "../../model/transaction";
 import { Wallet } from "../../model/wallet";
+import styles from "./styles.module.css";
 
 const columns: GridColDef[] = [
   { field: "hash", headerName: "Transaction", width: 150 },
@@ -35,7 +36,7 @@ export default function Transactions({ transactions }: Props) {
 
   return (
     <>
-      <div style={{ height: 400, width: 1200 }}>
+      <div className={styles.tab}>
         <DataGrid
           rows={rows}
           columns={columns}

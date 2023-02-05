@@ -125,7 +125,8 @@ export default async function fetchTransactionTree(
   limit = DEFAULT_LIMIT
 ): Promise<Transaction[]> {
   const transactions = [];
-  const targets = await fetchChildTransactions(
+
+  await fetchChildTransactions(
     wallets,
     transactions,
     start,
@@ -135,7 +136,7 @@ export default async function fetchTransactionTree(
     limit
   );
 
-  const senders = await fetchChildTransactions(
+  await fetchChildTransactions(
     wallets,
     transactions,
     start,
