@@ -51,7 +51,7 @@ const nodeCanvasObject = (
 
   const strokeStyle = node.isRootAddress
     ? "#Ffe430"
-    : strokeStyleByWalletType.get(node.wallletType);
+    : strokeStyleByWalletType.get(node.walletType);
   if (strokeStyle) {
     canvasContext.strokeStyle = strokeStyle;
     canvasContext.stroke();

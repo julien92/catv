@@ -41,7 +41,7 @@ export const buildGraph = (
       id: address,
       val: 1,
       alias,
-      wallletType: computeWalletType({ address, alias }),
+      walletType: computeWalletType({ address, alias }),
       isRootAddress: address === rootAddress,
     };
   });
