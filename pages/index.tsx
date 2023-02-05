@@ -35,20 +35,19 @@ export default function Home() {
   useEffect(() => {
     if (validateAddress(criteria.address) !== ValidationResult.VALID) return;
     if (criteria.depth < 1 || criteria.depth > 10) return;
-
     if (criteria.limit < 1) return;
+    if (criteria.from > criteria.to) return;
 
-    if (criteria.from)
-      /* TODO Cancel fetch on criteria change */
-      fetchTransactionTree(
-        [{ address: criteria.address } as Wallet],
-        criteria.from,
-        criteria.to,
-        criteria.depth,
-        criteria.limit
-      ).then((transactions) => {
-        setTransactions(transactions);
-      });
+    /* TODO Cancel fetch on criteria change */
+    fetchTransactionTree(
+      [{ address: criteria.address } as Wallet],
+      criteria.from,
+      criteria.to,
+      criteria.depth,
+      criteria.limit
+    ).then((transactions) => {
+      setTransactions(transactions);
+    });
   }, [criteria]);
 
   const handleCriteriaChange = ({
