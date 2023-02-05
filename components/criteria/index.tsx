@@ -40,11 +40,15 @@ export default function Criteria({ value, onChange }: Props) {
     onChange({ ...value, limit: event.target.value as number });
   };
 
-  const handleDateFromChange = (v: Moment) => {
+  const handleDateFromChange = (v: Moment | null) => {
+    if (!v?.isValid()) return;
+
     onChange({ ...value, from: v.toDate() });
   };
 
-  const handleDateToChange = (v: Moment) => {
+  const handleDateToChange = (v: Moment | null) => {
+    if (!v?.isValid()) return;
+
     onChange({ ...value, to: v.toDate() });
   };
 
