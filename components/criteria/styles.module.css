@@ -2,12 +2,9 @@
   margin-top: 30px;
   display: flex;
   flex-direction: row;
+  gap: 12px;
 }
 
 .wallet {
-  width: 600px;
-}
-
-.select {
-  margin-left: 8px;
+  width: 375px;
 }

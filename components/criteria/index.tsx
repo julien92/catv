@@ -45,7 +45,7 @@ export default function Criteria({ value, onChange }: Props) {
             onChange={handleAddressChange}
           />
         </div>
-        <div className={styles.select}>
+        <div>
           <FormControl>
             <InputLabel>Depth</InputLabel>
             <Select
@@ -60,7 +60,7 @@ export default function Criteria({ value, onChange }: Props) {
             </Select>
           </FormControl>
         </div>
-        <div className={styles.select}>
+        <div>
           <FormControl>
             <InputLabel>Limit</InputLabel>
             <Select
