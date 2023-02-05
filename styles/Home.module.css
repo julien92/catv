@@ -1,9 +1,12 @@
 .container {
+  padding: 3rem 1rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-  min-height: 100vh;
+  justify-content: flex-start;
+  min-height: calc(100vh - 70px);
+  max-width: 1280px;
+  margin: 0 auto;
+  gap: 1rem;
 }
 
 .header {

@@ -1,10 +1,19 @@
 .criteria {
-  margin-top: 30px;
   display: flex;
   flex-direction: row;
-  gap: 12px;
+  gap: 1rem;
+  align-self: center;
 }
 
-.wallet {
-  width: 375px;
+.addressInput {
+  min-width: 360px;
+}
+
+.depthSelect,
+.limitSelect {
+  min-width: 96px;
+}
+
+.dateSelect {
+  min-width: 248px;
 }

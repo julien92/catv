@@ -3,6 +3,8 @@ import "../styles/globals.css";
 import { Roboto } from "@next/font/google";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 
 const roboto = Roboto({
   weight: "400",
@@ -17,11 +19,13 @@ const darkTheme = createTheme({
 
 export default function App({ Component, pageProps }) {
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <main className={roboto.className}>
-        <Component {...pageProps} />
-      </main>
-    </ThemeProvider>
+    <LocalizationProvider dateAdapter={AdapterMoment}>
+      <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
+        <main className={roboto.className}>
+          <Component {...pageProps} />
+        </main>
+      </ThemeProvider>
+    </LocalizationProvider>
   );
 }

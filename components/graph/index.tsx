@@ -76,22 +76,18 @@ export default function Graphs({ transactions, rootAddress }: Props) {
   }, [transactions, rootAddress]);
 
   return (
-    <>
-      <div className={styles.graph}>
-        <ForceGraph2D
-          graphData={graph}
-          nodeId="id"
-          nodeLabel={nodeLabel}
-          width={1200}
-          height={600}
-          backgroundColor="#9b9b9b"
-          linkDirectionalArrowLength={4}
-          linkDirectionalArrowRelPos={1}
-          linkWidth={2}
-          nodeCanvasObject={nodeCanvasObject}
-          onNodeClick={onNodeClick}
-        />
-      </div>
-    </>
+    <ForceGraph2D
+      graphData={graph}
+      nodeId="id"
+      nodeLabel={nodeLabel}
+      width={1248}
+      height={600}
+      backgroundColor="#9b9b9b"
+      linkDirectionalArrowLength={4}
+      linkDirectionalArrowRelPos={1}
+      linkWidth={2}
+      nodeCanvasObject={nodeCanvasObject}
+      onNodeClick={onNodeClick}
+    />
   );
 }

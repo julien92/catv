@@ -150,6 +150,5 @@ export default async function fetchTransactionTree(
     (t1, i, a) => a.findIndex((t2) => t2.id === t1.id) === i
   );
 
-  console.log("transactions here", uniqueTx);
   return uniqueTx;
 }

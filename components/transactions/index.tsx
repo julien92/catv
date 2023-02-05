@@ -55,7 +55,6 @@ const onDoubleClick = (event) => {
 };
 
 function buildRows(transactions: Transaction[]): Rows[] {
-  console.log("build rows", transactions);
   return transactions.map((transaction) => {
     return {
       id: transaction.id,

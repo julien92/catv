@@ -11,45 +11,58 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import fetchTransactionTree from "../tzkt/fetchTransactionTree";
 import { Wallet } from "../model/wallet";
+import moment from "moment";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   const [transactions, setTransactions] = useState([]);
   const router = useRouter();
-  const { address, depth, limit } = useRouter().query;
-  const criteria = useMemo(
+  const { address, depth, limit, from, to } = useRouter().query;
+  const criteria: CriteriaValue = useMemo(
     () => ({
       address: (address as string) || "",
       depth: parseInt(depth as string) || 1,
       limit: parseInt(limit as string) || 20,
+      from: from
+        ? new Date(from as string)
+        : moment().subtract(1, "years").toDate(),
+      to: to ? new Date(to as string) : new Date(),
     }),
-    [address, depth, limit]
+    [address, depth, limit, from, to]
   );
 
   useEffect(() => {
-    if (validateAddress(address as string) !== ValidationResult.VALID) return;
-    const _depth = parseInt(depth as string);
-    if (_depth < 1 || _depth > 10) return;
+    if (validateAddress(criteria.address) !== ValidationResult.VALID) return;
+    if (criteria.depth < 1 || criteria.depth > 10) return;
 
-    const _limit = parseInt(limit as string);
-    if (_limit < 1) return;
+    if (criteria.limit < 1) return;
 
-    fetchTransactionTree(
-      [{ address: address } as Wallet],
-      new Date("2020-01-01T00:00:00Z"),
-      new Date(),
-      _depth,
-      _limit
-    ).then((transactions) => {
-      setTransactions(transactions);
-    });
-  }, [address, depth, limit]);
+    if (criteria.from)
+      /* TODO Cancel fetch on criteria change */
+      fetchTransactionTree(
+        [{ address: criteria.address } as Wallet],
+        criteria.from,
+        criteria.to,
+        criteria.depth,
+        criteria.limit
+      ).then((transactions) => {
+        setTransactions(transactions);
+      });
+  }, [criteria]);
 
-  const handleCriteriaChange = ({ address, depth, limit }: CriteriaValue) => {
+  const handleCriteriaChange = ({
+    address,
+    depth,
+    limit,
+    from,
+    to,
+  }: CriteriaValue) => {
     if (depth < 0 || depth > 10) return;
     if (limit < 0) return;
-    router.push(`/?address=${address}&depth=${depth}&limit=${limit}`);
+    router.push(
+      `/?address=${address}&depth=${depth}&limit=${limit}&from=${from.toISOString()}&to=${to.toISOString()}`
+    );
   };
 
   return (
