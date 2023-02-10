@@ -7,4 +7,16 @@ export interface Transaction {
   amount: number;
   timestamp: string;
   hash: string;
+  parameter: Parameter;
+}
+
+interface Parameter {
+  entrypoint: string;
+  value: ParameterValue;
+}
+
+interface ParameterValue {
+  from: string;
+  to: string;
+  value: number;
 }

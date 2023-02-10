@@ -1,7 +1,11 @@
 import axios from "axios";
 import { Transaction } from "../model/transaction";
 import { Wallet } from "../model/wallet";
-import { isUserWallet } from "../util/tezosUtil";
+import {
+  isFinancialAssetsTransfer,
+  isSmartContract,
+  isUserWallet,
+} from "../util/tezosUtil";
 
 const DEFAULT_DEPTH = 1;
 const DEFAULT_LIMIT = 20;
@@ -68,10 +72,25 @@ async function fetchUniqueWallet(
     limit
   );
 
-  const walletDiscovered: Wallet[] = tx.map((t) =>
+  const smartContractTransferTx = tx.filter((t) => {
+    isFinancialAssetsTransfer(t);
+  });
+
+  const directTx = tx.filter((x) => !smartContractTransferTx.includes(x));
+
+  let walletDiscovered: Wallet[] = directTx.map((t) =>
     direction === Direction.IN ? t.sender : t.target
   );
 
+  if (smartContractTransferTx) {
+    walletDiscovered = walletDiscovered.concat(
+      smartContractTransferTx.map((t) =>
+        direction === Direction.IN
+          ? t.parameter.entrypoint.from
+          : t.parameter.entrypoint.to
+      )
+    );
+  }
   const walletAddresses = walletDiscovered.map(
     (transaction) => transaction.address
   );
