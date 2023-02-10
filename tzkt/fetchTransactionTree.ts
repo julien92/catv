@@ -33,7 +33,7 @@ async function fetchTransactions(
       const { data } = await axios.get<Transaction[]>(
         `https://api.tzkt.io/v1/operations/transactions/?${type}=${
           wallet.address
-        }&timestamp.gt=${start.toISOString()}&timestamp.le=${end.toISOString()}&limit=${limit}`
+        }&timestamp.ge=${start.toISOString()}&timestamp.le=${end.toISOString()}&limit=${limit}`
       );
       await sleep(20);
 
