@@ -48,3 +48,15 @@ export function isFinancialAssetsTransfer(transaction: Transaction) {
     transaction.parameter?.entrypoint === "transfer"
   );
 }
+
+export function getTransactionSource(transaction: Transaction) {
+  return isFinancialAssetsTransfer(transaction)
+    ? transaction.parameter.value.from
+    : transaction.sender.address;
+}
+
+export function getTransactionTarget(transaction: Transaction) {
+  return isFinancialAssetsTransfer(transaction)
+    ? transaction.parameter.value.to
+    : transaction.target.address;
+}

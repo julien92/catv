@@ -1,11 +1,7 @@
 import axios from "axios";
 import { Transaction } from "../model/transaction";
 import { Wallet } from "../model/wallet";
-import {
-  isFinancialAssetsTransfer,
-  isSmartContract,
-  isUserWallet,
-} from "../util/tezosUtil";
+import { isFinancialAssetsTransfer, isUserWallet } from "../util/tezosUtil";
 
 const DEFAULT_DEPTH = 1;
 const DEFAULT_LIMIT = 20;

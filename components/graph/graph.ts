@@ -1,8 +1,9 @@
 import { Transaction } from "../../model/transaction";
 import {
   computeWalletType,
+  getTransactionSource,
+  getTransactionTarget,
   isFinancialAssetsTransfer,
-  isSmartContract,
 } from "../../util/tezosUtil";
 
 export interface NodeGraph {
@@ -24,10 +25,8 @@ export const buildGraph = (
   transactions: Transaction[],
   rootAddress: string
 ) => {
-  const transferTx = transactions.filter((t) => isFinancialAssetsTransfer(t));
-  const directTx = transactions.filter((x) => !transferTx.includes(x));
-  const uniqueSenderAdress = directTx.map((t) => t.sender.address);
-  const uniqueTargetAdress = directTx.map((t) => t.target.address);
+  const uniqueSenderAdress = transactions.map((t) => getTransactionSource(t));
+  const uniqueTargetAdress = transactions.map((t) => getTransactionTarget(t));
 
   var aliasByWallet = transactions.reduce(function (map, t) {
     map[t.sender.address] = t.sender.alias;
@@ -36,10 +35,7 @@ export const buildGraph = (
   }, {});
 
   const nodes = removeDuplicate(
-    uniqueSenderAdress
-      .concat(uniqueTargetAdress)
-      .concat(transferTx.map((t) => t.parameter.value.to))
-      .concat(transferTx.map((t) => t.parameter.value.from))
+    uniqueSenderAdress.concat(uniqueTargetAdress)
   ).map((address) => {
     const alias = aliasByWallet[address];
     return {
@@ -51,15 +47,9 @@ export const buildGraph = (
     };
   });
 
-  const directLinks = directTx.map((t) => {
-    return { source: t.sender.address, target: t.target.address };
+  const links = transactions.map((t) => {
+    return { source: getTransactionSource(t), target: getTransactionTarget(t) };
   });
-
-  const linksTransfer = transferTx.map((t) => {
-    return { source: t.parameter.value.from, target: t.parameter.value.to };
-  });
-
-  const links = directLinks.concat(linksTransfer);
 
   return {
     nodes,
