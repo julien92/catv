@@ -2,9 +2,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { Transaction } from "../../model/transaction";
 import { WalletType } from "../../model/wallet";
-import { buildGraph, Graph } from "./graph";
-
-import styles from "./styles.module.css";
+import { buildGraph, Graph, NodeGraph } from "./graph";
 
 const ForceGraph2D = dynamic(
   () => import("react-force-graph").then((mod) => mod.ForceGraph2D),
@@ -26,7 +24,7 @@ const strokeStyleByWalletType: Map<WalletType, string> = new Map([
   [WalletType.SmartContract, "#B1ecff"],
 ]);
 
-const onNodeClick = (node: any, event: MouseEvent) => {
+const onNodeClick = (node: NodeGraph) => {
   window.open(`https://tzkt.io/${node.id}`, "_blank");
 };
 
@@ -43,7 +41,7 @@ const nodeCanvasObject = (
   canvasContext: CanvasRenderingContext2D
 ) => {
   const image = new Image();
-  image.src = `https://services.tzkt.io/v1/avatars/${node.id}`;
+  image.src = node.avatarUrl;
 
   canvasContext.save();
   canvasContext.beginPath();

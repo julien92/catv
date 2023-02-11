@@ -1,11 +1,7 @@
-import axios from "axios";
+import { Tzkt } from "./tezos/tzkt/api";
 import { Transaction } from "../model/transaction";
 import { Wallet } from "../model/wallet";
-import {
-  isFinancialAssetsTransfer,
-  isSmartContract,
-  isUserWallet,
-} from "../util/tezosUtil";
+import { isUserWallet } from "./tezos/util/tezosUtil";
 
 const DEFAULT_DEPTH = 1;
 const DEFAULT_LIMIT = 20;
@@ -34,11 +30,15 @@ async function fetchTransactions(
 
   for (let wallet of wallets) {
     if (isUserWallet(wallet)) {
-      const { data } = await axios.get<Transaction[]>(
-        `https://api.tzkt.io/v1/operations/transactions/?${type}=${
-          wallet.address
-        }&timestamp.ge=${start.toISOString()}&timestamp.le=${end.toISOString()}&limit=${limit}`
-      );
+      let fetcher = new Tzkt();
+
+      const data = await fetcher.get({
+        address: wallet.address,
+        type,
+        start,
+        end,
+        limit,
+      });
       await sleep(20);
 
       data.forEach((tx) => {
@@ -72,25 +72,10 @@ async function fetchUniqueWallet(
     limit
   );
 
-  const smartContractTransferTx = tx.filter((t) => {
-    isFinancialAssetsTransfer(t);
-  });
-
-  const directTx = tx.filter((x) => !smartContractTransferTx.includes(x));
-
-  let walletDiscovered: Wallet[] = directTx.map((t) =>
+  let walletDiscovered: Wallet[] = tx.map((t) =>
     direction === Direction.IN ? t.sender : t.target
   );
 
-  if (smartContractTransferTx) {
-    walletDiscovered = walletDiscovered.concat(
-      smartContractTransferTx.map((t) =>
-        direction === Direction.IN
-          ? t.parameter.entrypoint.from
-          : t.parameter.entrypoint.to
-      )
-    );
-  }
   const walletAddresses = walletDiscovered.map(
     (transaction) => transaction.address
   );
@@ -136,7 +121,7 @@ async function fetchChildTransactions(
   }));
 }
 
-export default async function fetchTransactionTree(
+export default async function getTransactions(
   wallets: Wallet[],
   start: Date,
   end: Date,
