@@ -1,5 +1,4 @@
-import { Transaction } from "../model/transaction";
-import { WalletType } from "../model/wallet";
+import { WalletType } from "../../../model/wallet";
 
 const exchangeAliases = [
   "binance",
@@ -40,11 +39,4 @@ export function computeWalletType(wallet: { address: string; alias: string }) {
   }
 
   return walletType;
-}
-
-export function isFinancialAssetsTransfer(transaction: Transaction) {
-  return (
-    isSmartContract(transaction.target.address) &&
-    transaction.parameter?.entrypoint === "transfer"
-  );
 }

@@ -1,14 +1,14 @@
 import { Transaction } from "../../model/transaction";
-import {
-  computeWalletType,
-  isFinancialAssetsTransfer,
-  isSmartContract,
-} from "../../util/tezosUtil";
+import { Wallet, WalletType } from "../../model/wallet";
 
 export interface NodeGraph {
   id: string;
   alias: string;
+  walletType: WalletType;
   val: number;
+  isRootAddress: boolean;
+  avatarUrl: string;
+  dispalyUrl: string;
 }
 
 export interface Link {
@@ -23,43 +23,29 @@ export interface Graph {
 export const buildGraph = (
   transactions: Transaction[],
   rootAddress: string
-) => {
-  const transferTx = transactions.filter((t) => isFinancialAssetsTransfer(t));
-  const directTx = transactions.filter((x) => !transferTx.includes(x));
-  const uniqueSenderAdress = directTx.map((t) => t.sender.address);
-  const uniqueTargetAdress = directTx.map((t) => t.target.address);
+): Graph => {
+  const wallets = [];
 
-  var aliasByWallet = transactions.reduce(function (map, t) {
-    map[t.sender.address] = t.sender.alias;
-    map[t.target.address] = t.target.alias;
-    return map;
-  }, {});
+  transactions.forEach((t) => {
+    wallets.push(t.sender);
+    wallets.push(t.target);
+  });
 
-  const nodes = removeDuplicate(
-    uniqueSenderAdress
-      .concat(uniqueTargetAdress)
-      .concat(transferTx.map((t) => t.parameter.value.to))
-      .concat(transferTx.map((t) => t.parameter.value.from))
-  ).map((address) => {
-    const alias = aliasByWallet[address];
+  const nodes = removeDuplicateWallet(wallets).map((wallet) => {
     return {
-      id: address,
+      id: wallet.address,
+      alias: wallet.alias,
+      walletType: wallet.type,
       val: 1,
-      alias,
-      walletType: computeWalletType({ address, alias }),
-      isRootAddress: address === rootAddress,
+      isRootAddress: wallet.address === rootAddress,
+      avatarUrl: wallet.avatarUrl,
+      dispalyUrl: wallet.displayUrl,
     };
   });
 
-  const directLinks = directTx.map((t) => {
+  const links = transactions.map((t) => {
     return { source: t.sender.address, target: t.target.address };
   });
-
-  const linksTransfer = transferTx.map((t) => {
-    return { source: t.parameter.value.from, target: t.parameter.value.to };
-  });
-
-  const links = directLinks.concat(linksTransfer);
 
   return {
     nodes,
@@ -67,8 +53,9 @@ export const buildGraph = (
   };
 };
 
-function removeDuplicate(address: string[]) {
-  return address.filter(
-    (addr, index, a) => a.findIndex((addr2) => addr2 === addr) === index
+const removeDuplicateWallet = (wallets: Wallet[]) => {
+  const addresses = wallets.map((transaction) => transaction.address);
+  return wallets.filter(
+    ({ address }, index) => !addresses.includes(address, index + 1)
   );
-}
+};

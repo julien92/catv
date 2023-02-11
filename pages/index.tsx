@@ -9,9 +9,9 @@ import { useEffect, useMemo, useState } from "react";
 import { validateAddress, ValidationResult } from "@taquito/utils";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import fetchTransactionTree from "../tzkt/fetchTransactionTree";
 import { Wallet } from "../model/wallet";
 import moment from "moment";
+import getTransactions from "../fetcher/data-fetcher";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,7 +39,7 @@ export default function Home() {
     if (criteria.from > criteria.to) return;
 
     /* TODO Cancel fetch on criteria change */
-    fetchTransactionTree(
+    getTransactions(
       [{ address: criteria.address } as Wallet],
       criteria.from,
       criteria.to,

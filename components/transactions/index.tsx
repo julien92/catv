@@ -1,10 +1,7 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { TokenTransfer } from "../../model/token";
 import { Transaction } from "../../model/transaction";
 import { Wallet } from "../../model/wallet";
-import { isFinancialAssetsTransfer } from "../../util/tezosUtil";
 import styles from "./styles.module.css";
 
 const columns: GridColDef[] = [
@@ -59,45 +56,16 @@ const onDoubleClick = (event) => {
 
 function buildRows(transactions: Transaction[]): Rows[] {
   return transactions.map((transaction) => {
-    const isFinancialAssetsTx = isFinancialAssetsTransfer(transaction);
-    const sender = isFinancialAssetsTx
-      ? transaction.parameter.value.from
-      : getAliasIfExist(transaction.sender);
-    const target = isFinancialAssetsTx
-      ? transaction.parameter.value.to
-      : getAliasIfExist(transaction.target);
-
-    // TODO UNCOMMENT WHEN RETRIEVE TOKENS
-    // const amount = isFinancialAssetsTx
-    //   ? getAmountFinancialAsset(transaction)
-    //   : getAmount(transaction);
-
     return {
       id: transaction.id,
       hash: transaction.hash,
-      sender: sender,
-      target: target,
+      sender: getAliasIfExist(transaction.sender),
+      target: getAliasIfExist(transaction.target),
       time: transaction.timestamp,
-      // TODO RETRIEVE AMOUNT FROM FINANCIAL ASSET
       amount: getAmount(transaction),
     };
   });
 }
-
-const getAmountFinancialAsset = async (transaction: Transaction) => {
-  const tokenTransfert = await getFinancialAssetsSymbol(transaction);
-  return tokenTransfert.amount + tokenTransfert.token.metadata.symbol;
-};
-
-const getFinancialAssetsSymbol = async (
-  transaction: Transaction
-): Promise<TokenTransfer> => {
-  const { data } = await axios.get<TokenTransfer[]>(
-    `https://back.tzkt.io/v1/tokens/transfers?transactionId.eq=${transaction.id}`
-  );
-
-  return data[0];
-};
 
 const getAliasIfExist = (wallet: Wallet) => {
   return wallet.alias ? wallet.alias : wallet.address;
