@@ -11,6 +11,7 @@ const exchangeAliases = [
   "bittrex",
   "exchange",
   "temple",
+  "okex",
 ];
 
 export function isSmartContract(address: string) {
