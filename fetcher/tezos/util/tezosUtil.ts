@@ -1,4 +1,4 @@
-import { WalletType } from "../../../model/wallet";
+import { Wallet, WalletType } from "../../../model/wallet";
 
 const exchangeAliases = [
   "binance",
@@ -30,7 +30,7 @@ export function isUserWallet(wallet: { address: string; alias: string }) {
   return !(isSmartContract(wallet.address) || isExchangeWallet(wallet));
 }
 
-export function computeWalletType(wallet: { address: string; alias: string }) {
+export function getWalletType(wallet: Wallet) {
   let walletType = WalletType.User;
   if (isSmartContract(wallet.address)) {
     walletType = WalletType.SmartContract;
