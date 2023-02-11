@@ -16,3 +16,6 @@ curl https://api.tzkt.io/v1/operations/transactions/?\
 &timestamp.gt={{start}}\
 &timestamp.le={{end}}\
 &limit=10
+
+###
+curl https://back.tzkt.io/v1/tokens/transfers?anyof.from.to={{wallet}}
