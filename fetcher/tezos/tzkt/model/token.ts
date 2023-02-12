@@ -9,5 +9,6 @@ interface Token {
 
 interface TokenMetadata {
   decimals: string;
-  symbol: string;
+  symbol?: string;
+  name?: string;
 }

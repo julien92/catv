@@ -28,7 +28,8 @@ export const mapTokensTransaction = (
     amount: convertTokenAmount(transaction),
     target: buildWallet(transaction.to),
     sender: buildWallet(transaction.from),
-    symbol: transaction.token.metadata?.symbol,
+    symbol:
+      transaction.token.metadata?.symbol || transaction.token.metadata?.name,
     displayUrl: `https://tzkt.io/transactions/${transaction.transactionId}`,
   };
 };
