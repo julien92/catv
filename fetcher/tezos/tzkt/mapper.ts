@@ -1,42 +1,54 @@
 import { Transaction } from "../../../model/transaction";
 import { Wallet } from "../../../model/wallet";
 import { getWalletType } from "../util/tezosUtil";
+import { TokenTransaction } from "./model/TokenTransaction";
 import { TzktTransaction } from "./model/TzktTransaction";
-import { isFinancialAssetsTransfer } from "./tzktUtil";
 
-export const mapTzktTransaction = (transaction: TzktTransaction) => {
-  let mappedTx: Transaction = transaction;
+export const mapXtzTransaction = (
+  transaction: TzktTransaction
+): Transaction => {
+  return {
+    ...transaction,
+    amount: convertAmount(transaction.amount, 6),
+    symbol: "XTZ",
+    sender: buildWallet(transaction.sender),
+    target: buildWallet(transaction.target),
+    displayUrl: `https://tzkt.io/${transaction.hash}`,
+  };
+};
 
-  if (isFinancialAssetsTransfer(transaction)) {
-    const parameterValue = transaction.parameter.value;
-    mappedTx.sender = {
-      address: parameterValue.from,
-      alias: transaction.sender.alias,
-      type: undefined,
-      avatarUrl: "",
-      displayUrl: "",
-    };
-    mappedTx.target = {
-      address: transaction.parameter.value.to,
-      alias: undefined,
-      type: undefined,
-      avatarUrl: "",
-      displayUrl: "",
-    };
+export const mapTokensTransaction = (
+  transaction: TokenTransaction
+): Transaction => {
+  if (transaction.to === undefined || transaction.from === undefined) {
+    debugger;
   }
-
-  computeWalletInformation(mappedTx.sender);
-  computeWalletInformation(mappedTx.target);
-
-  return mappedTx;
+  return {
+    ...transaction,
+    amount: convertTokenAmount(transaction),
+    target: buildWallet(transaction.to),
+    sender: buildWallet(transaction.from),
+    symbol: transaction.token.metadata?.symbol,
+    displayUrl: `https://tzkt.io/transactions/${transaction.transactionId}`,
+  };
 };
 
-const computeWalletInformation = (wallet: Wallet) => {
-  computeWalletUrl(wallet);
-  wallet.type = getWalletType(wallet);
+const buildWallet = (wallet: Wallet) => {
+  return {
+    ...wallet,
+    type: getWalletType(wallet),
+    avatarUrl: `https://services.tzkt.io/v1/avatars/${wallet.address}`,
+    displayUrl: `https://tzkt.io/${wallet.address}`,
+  };
 };
 
-const computeWalletUrl = (wallet: Wallet) => {
-  wallet.avatarUrl = `https://services.tzkt.io/v1/avatars/${wallet.address}`;
-  wallet.displayUrl = `https://tzkt.io/${wallet.address}`;
+const convertTokenAmount = (tokenTransaction: TokenTransaction) => {
+  return convertAmount(
+    +tokenTransaction.amount,
+    +tokenTransaction.token.metadata?.decimals || 0
+  );
+};
+
+const convertAmount = (amount: number, decimal: number) => {
+  return amount / 10 ** decimal;
 };
