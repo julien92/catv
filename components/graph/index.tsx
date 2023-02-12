@@ -1,5 +1,5 @@
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Transaction } from "../../model/transaction";
 import { WalletType } from "../../model/wallet";
 import { buildGraph, Graph, NodeGraph } from "./graph";
@@ -36,34 +36,32 @@ const nodeLabel = (node: any) => {
   return label;
 };
 
-const nodeCanvasObject = (
-  node: any,
-  canvasContext: CanvasRenderingContext2D
-) => {
-  const image = new Image();
-  image.src = node.avatarUrl;
+const nodeCanvasObject =
+  (imageMap: Record<string, HTMLImageElement>) =>
+  (node: any, canvasContext: CanvasRenderingContext2D) => {
+    canvasContext.save();
+    canvasContext.beginPath();
+    canvasContext.arc(node.x, node.y, 4, 0, Math.PI * 2, true);
 
-  canvasContext.save();
-  canvasContext.beginPath();
-  canvasContext.arc(node.x, node.y, 4, 0, Math.PI * 2, true);
+    const strokeStyle = node.isRootAddress
+      ? "#Ffe430"
+      : strokeStyleByWalletType.get(node.walletType);
+    if (strokeStyle) {
+      canvasContext.strokeStyle = strokeStyle;
+      canvasContext.stroke();
+    }
 
-  const strokeStyle = node.isRootAddress
-    ? "#Ffe430"
-    : strokeStyleByWalletType.get(node.walletType);
-  if (strokeStyle) {
-    canvasContext.strokeStyle = strokeStyle;
-    canvasContext.stroke();
-  }
+    canvasContext.closePath();
+    canvasContext.clip();
 
-  canvasContext.closePath();
-  canvasContext.clip();
+    canvasContext.fillStyle = "#666666";
+    canvasContext.fillRect(node.x - 4, node.y - 4, 8, 8);
 
-  canvasContext.fillStyle = "#666666";
-  canvasContext.fillRect(node.x - 4, node.y - 4, 8, 8);
-
-  canvasContext.fillStyle = "transparent";
-  canvasContext.drawImage(image, node.x - 4, node.y - 4, 8, 8);
-};
+    if (imageMap[node.id]) {
+      canvasContext.fillStyle = "transparent";
+      canvasContext.drawImage(imageMap[node.id], node.x - 4, node.y - 4, 8, 8);
+    }
+  };
 
 export default function Graphs({ transactions, rootAddress }: Props) {
   const [graph, setGraph] = useState<Graph>({ nodes: [], links: [] });
@@ -72,6 +70,25 @@ export default function Graphs({ transactions, rootAddress }: Props) {
 
     setGraph(buildGraph(transactions, rootAddress));
   }, [transactions, rootAddress]);
+
+  const imageMap = useMemo(() => {
+    const map = {};
+
+    transactions.forEach((transaction) => {
+      if (!map[transaction.sender.address]) {
+        map[transaction.sender.address] = new Image();
+        map[transaction.sender.address].src = transaction.sender.avatarUrl;
+      }
+      if (!map[transaction.target.address]) {
+        map[transaction.target.address] = new Image();
+        map[transaction.target.address].src = transaction.target.avatarUrl;
+      }
+    });
+
+    console.log(map);
+
+    return map;
+  }, [transactions]);
 
   return (
     <ForceGraph2D
@@ -84,7 +101,7 @@ export default function Graphs({ transactions, rootAddress }: Props) {
       linkDirectionalArrowLength={4}
       linkDirectionalArrowRelPos={1}
       linkWidth={2}
-      nodeCanvasObject={nodeCanvasObject}
+      nodeCanvasObject={nodeCanvasObject(imageMap)}
       onNodeClick={onNodeClick}
     />
   );
