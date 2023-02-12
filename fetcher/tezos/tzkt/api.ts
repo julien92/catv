@@ -7,6 +7,7 @@ import { mapTokensTransaction, mapXtzTransaction } from "./mapper";
 import { TokenTransaction } from "./model/TokenTransaction";
 
 const API_URL = "https://api.tzkt.io/v1";
+
 export class Tzkt implements fetcher {
   async get(criteria: Criteria): Promise<Transaction[]> {
     const tx1 = this.getXtzTransactions(criteria);
@@ -21,12 +22,10 @@ export class Tzkt implements fetcher {
         criteria.address
       }&timestamp.ge=${criteria.start.toISOString()}&amount.gt=0&timestamp.le=${criteria.end.toISOString()}&limit=${
         criteria.limit
-      }`
+      }&sender.null=false&target.null=false`
     );
 
-    return data
-      .filter((t) => t.sender && t.target)
-      .map((t) => mapXtzTransaction(t));
+    return data.map((t) => mapXtzTransaction(t));
   }
 
   async getTokensTransactions(criteria: Criteria): Promise<Transaction[]> {
@@ -37,12 +36,10 @@ export class Tzkt implements fetcher {
         criteria.address
       }&timestamp.ge=${criteria.start.toISOString()}&amount.gt=0&timestamp.le=${criteria.end.toISOString()}&limit=${
         criteria.limit
-      }`
+      }&from.null=false&to.null=false`
     );
 
-    return data
-      .filter((t) => t.to && t.from)
-      .map((t) => mapTokensTransaction(t));
+    return data.map((t) => mapTokensTransaction(t));
   }
 
   async getFinancialAssetsSymbol(
