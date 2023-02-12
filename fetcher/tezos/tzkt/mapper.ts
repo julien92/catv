@@ -9,6 +9,7 @@ export const mapXtzTransaction = (
 ): Transaction => {
   return {
     ...transaction,
+    operationId: transaction.hash,
     amount: convertAmount(transaction.amount, 6),
     symbol: "XTZ",
     sender: buildWallet(transaction.sender),
@@ -25,6 +26,7 @@ export const mapTokensTransaction = (
   }
   return {
     ...transaction,
+    operationId: `${transaction.transactionId}`,
     amount: convertTokenAmount(transaction),
     target: buildWallet(transaction.to),
     sender: buildWallet(transaction.from),

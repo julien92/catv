@@ -7,7 +7,7 @@ export interface Transaction {
   sender: Wallet;
   amount: number;
   timestamp: string;
-  hash?: string;
+  operationId: string;
   symbol: string;
   displayUrl: string;
 }

@@ -5,7 +5,7 @@ import { Wallet } from "../../model/wallet";
 import styles from "./styles.module.css";
 
 const columns: GridColDef[] = [
-  { field: "hash", headerName: "Transaction", width: 150 },
+  { field: "operationId", headerName: "Transaction", width: 150 },
   { field: "sender", headerName: "From", width: 335 },
   { field: "target", headerName: "To", width: 335 },
   { field: "time", headerName: "Time", width: 200 },
@@ -17,7 +17,7 @@ interface Props {
 }
 interface Rows {
   id: string;
-  hash: string;
+  operationId: string;
   sender: string;
   target: string;
   time: string;
@@ -60,7 +60,7 @@ function buildRows(transactions: Transaction[]): Rows[] {
   return transactions.map((transaction) => {
     return {
       id: transaction.id,
-      hash: transaction.hash,
+      operationId: transaction.operationId,
       sender: getAliasIfExist(transaction.sender),
       target: getAliasIfExist(transaction.target),
       time: transaction.timestamp,
