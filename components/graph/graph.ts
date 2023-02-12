@@ -8,7 +8,7 @@ export interface NodeGraph {
   val: number;
   isRootAddress: boolean;
   avatarUrl: string;
-  dispalyUrl: string;
+  displayUrl: string;
 }
 
 export interface Link {
@@ -39,13 +39,22 @@ export const buildGraph = (
       val: 1,
       isRootAddress: wallet.address === rootAddress,
       avatarUrl: wallet.avatarUrl,
-      dispalyUrl: wallet.displayUrl,
+      displayUrl: wallet.displayUrl,
     };
   });
 
-  const links = transactions.map((t) => {
-    return { source: t.sender.address, target: t.target.address };
-  });
+  const links = transactions
+    .filter(
+      (ta, index) =>
+        transactions.findIndex(
+          (tb) =>
+            ta.sender.address === tb.sender.address &&
+            ta.target.address === tb.target.address
+        ) === index
+    )
+    .map((t) => {
+      return { source: t.sender.address, target: t.target.address };
+    });
 
   return {
     nodes,

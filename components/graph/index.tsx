@@ -85,8 +85,6 @@ export default function Graphs({ transactions, rootAddress }: Props) {
       }
     });
 
-    console.log(map);
-
     return map;
   }, [transactions]);
 
