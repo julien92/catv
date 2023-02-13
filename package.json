@@ -30,7 +30,7 @@
     "three-spritetext": "^1.6.5"
   },
   "devDependencies": {
-    "@types/node": "18.11.18",
+    "@types/node": "18.13.0",
     "@types/react": "18.0.26",
     "@types/three": "^0.148.0"
   }
