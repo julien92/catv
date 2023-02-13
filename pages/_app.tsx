@@ -5,6 +5,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { Analytics } from "@vercel/analytics/react";
 
 const roboto = Roboto({
   weight: "400",
@@ -26,6 +27,7 @@ export default function App({ Component, pageProps }) {
           <Component {...pageProps} />
         </main>
       </ThemeProvider>
+      <Analytics />
     </LocalizationProvider>
   );
 }
