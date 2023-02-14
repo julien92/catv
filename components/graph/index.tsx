@@ -63,6 +63,10 @@ const nodeCanvasObject =
     }
   };
 
+const arrowColor = () => {
+  return "rgb(75 75 75)";
+};
+
 export default function Graphs({ transactions, rootAddress }: Props) {
   const [graph, setGraph] = useState<Graph>({ nodes: [], links: [] });
   useEffect(() => {
@@ -95,10 +99,12 @@ export default function Graphs({ transactions, rootAddress }: Props) {
       nodeLabel={nodeLabel}
       width={1248}
       height={600}
-      backgroundColor="#9b9b9b"
+      backgroundColor="#121212"
       linkDirectionalArrowLength={4}
       linkDirectionalArrowRelPos={1}
-      linkWidth={2}
+      linkColor={arrowColor}
+      linkDirectionalArrowColor={arrowColor}
+      linkWidth={1}
       nodeCanvasObject={nodeCanvasObject(imageMap)}
       onNodeClick={onNodeClick}
     />
