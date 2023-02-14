@@ -7,8 +7,8 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import TextField from "@mui/material/TextField";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { validateAddress, ValidationResult } from "@taquito/utils";
 import { Moment } from "moment";
 import { ChangeEvent } from "react";
 
@@ -52,14 +52,28 @@ export default function Criteria({ value, onChange }: Props) {
     onChange({ ...value, to: v.toDate() });
   };
 
+  const validateWalletInput = (address: string) => {
+    return (
+      validateAddress(address) !== ValidationResult.VALID &&
+      value.address.length > 0
+    );
+  };
+
   return (
     <div className={styles.criteria}>
-      <Input
+      <TextField
+        error={validateWalletInput(value.address)}
         placeholder="Wallet address"
         fullWidth
         value={value.address}
         onChange={handleAddressChange}
         className={styles.addressInput}
+        helperText={
+          validateWalletInput(value.address)
+            ? "Please enter a valid tezos address"
+            : ""
+        }
+        variant="standard"
       />
       <FormControl className={styles.depthSelect} size="small">
         <InputLabel>Depth</InputLabel>
