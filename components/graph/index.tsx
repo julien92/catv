@@ -102,6 +102,9 @@ export default function Graphs({ transactions, rootAddress }: Props) {
       backgroundColor="#121212"
       linkDirectionalArrowLength={4}
       linkDirectionalArrowRelPos={1}
+      linkDirectionalParticles={2}
+      linkDirectionalParticleWidth={2}
+      linkDirectionalParticleSpeed={0.001}
       linkColor={arrowColor}
       linkDirectionalArrowColor={arrowColor}
       linkWidth={1}
