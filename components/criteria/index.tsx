@@ -8,8 +8,8 @@ import {
 import TextField from "@mui/material/TextField";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { validateAddress, ValidationResult } from "@taquito/utils";
-import { Moment } from "moment";
-import { ChangeEvent } from "react";
+import moment, { Moment } from "moment";
+import { ChangeEvent, useMemo } from "react";
 
 import styles from "./styles.module.css";
 
@@ -58,6 +58,9 @@ export default function Criteria({ value, onChange, disabled = false }: Props) {
       value.address.length > 0
     );
   };
+
+  const minDateTime = useMemo(() => moment(value.from), [value.from]);
+  const maxDateTime = useMemo(() => moment(value.to), [value.to]);
 
   return (
     <div className={styles.criteria}>
@@ -111,6 +114,7 @@ export default function Criteria({ value, onChange, disabled = false }: Props) {
           onChange={handleDateFromChange}
           renderInput={(params) => <TextField {...params} size="small" />}
           disabled={disabled}
+          maxDateTime={maxDateTime}
         />
       </FormControl>
       <FormControl className={styles.dateSelect}>
@@ -120,6 +124,7 @@ export default function Criteria({ value, onChange, disabled = false }: Props) {
           onChange={handleDateToChange}
           renderInput={(params) => <TextField {...params} size="small" />}
           disabled={disabled}
+          minDateTime={minDateTime}
         />
       </FormControl>
     </div>
