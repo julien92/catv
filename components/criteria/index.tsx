@@ -1,6 +1,5 @@
 import {
   FormControl,
-  Input,
   InputLabel,
   MenuItem,
   Select,
@@ -25,9 +24,10 @@ export interface CriteriaValue {
 interface Props {
   value: CriteriaValue;
   onChange: (value: CriteriaValue) => void;
+  disabled?: boolean;
 }
 
-export default function Criteria({ value, onChange }: Props) {
+export default function Criteria({ value, onChange, disabled = false }: Props) {
   const handleAddressChange = (event: ChangeEvent<HTMLInputElement>) => {
     onChange({ ...value, address: event.target.value });
   };
@@ -74,10 +74,16 @@ export default function Criteria({ value, onChange }: Props) {
             : ""
         }
         variant="standard"
+        disabled={disabled}
       />
       <FormControl className={styles.depthSelect} size="small">
         <InputLabel>Depth</InputLabel>
-        <Select value={value.depth} label="Depth" onChange={handleDepthChange}>
+        <Select
+          value={value.depth}
+          label="Depth"
+          onChange={handleDepthChange}
+          disabled={disabled}
+        >
           <MenuItem value={1}>1</MenuItem>
           <MenuItem value={2}>2</MenuItem>
           <MenuItem value={3}>3</MenuItem>
@@ -90,6 +96,7 @@ export default function Criteria({ value, onChange }: Props) {
           value={value.limit}
           label="Limit"
           onChange={handleTxLimitChange}
+          disabled={disabled}
         >
           <MenuItem value={20}>20</MenuItem>
           <MenuItem value={50}>50</MenuItem>
@@ -103,6 +110,7 @@ export default function Criteria({ value, onChange }: Props) {
           value={value.from}
           onChange={handleDateFromChange}
           renderInput={(params) => <TextField {...params} size="small" />}
+          disabled={disabled}
         />
       </FormControl>
       <FormControl className={styles.dateSelect}>
@@ -111,6 +119,7 @@ export default function Criteria({ value, onChange }: Props) {
           value={value.to}
           onChange={handleDateToChange}
           renderInput={(params) => <TextField {...params} size="small" />}
+          disabled={disabled}
         />
       </FormControl>
     </div>

@@ -1,21 +1,20 @@
 import Head from "next/head";
-import { Inter } from "@next/font/google";
 import styles from "../styles/Home.module.css";
 import Criteria, { CriteriaValue } from "../components/criteria";
 import Graph from "../components/graph";
 import Transactions from "../components/transactions";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { validateAddress, ValidationResult } from "@taquito/utils";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { Wallet, WalletType } from "../model/wallet";
 import moment from "moment";
 import getTransactions from "../fetcher/data-fetcher";
+import { CircularProgress } from "@mui/material";
+import { style } from "@mui/system";
 
-const inter = Inter({ subsets: ["latin"] });
-
-export default function Home() {
+const useFetchTransactions = () => {
   const [transactions, setTransactions] = useState([]);
   const router = useRouter();
   const { address, depth, limit, from, to } = useRouter().query;
@@ -31,6 +30,7 @@ export default function Home() {
     }),
     [address, depth, limit, from, to]
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (validateAddress(criteria.address) !== ValidationResult.VALID) return;
@@ -39,30 +39,54 @@ export default function Home() {
     if (criteria.from > criteria.to) return;
 
     /* TODO Cancel fetch on criteria change */
+
+    setIsLoading(true);
     getTransactions(
       [{ address: criteria.address, type: WalletType.User } as Wallet],
       criteria.from,
       criteria.to,
       criteria.depth,
       criteria.limit
-    ).then((transactions) => {
-      setTransactions(transactions);
-    });
+    )
+      .then((transactions) => {
+        setTransactions(transactions);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, [criteria]);
 
-  const handleCriteriaChange = ({
-    address,
-    depth,
-    limit,
-    from,
-    to,
-  }: CriteriaValue) => {
-    if (depth < 0 || depth > 10) return;
-    if (limit < 0) return;
-    router.push(
-      `/?address=${address}&depth=${depth}&limit=${limit}&from=${from.toISOString()}&to=${to.toISOString()}`
-    );
-  };
+  const handleCriteriaChange = useCallback(
+    ({ address, depth, limit, from, to }: CriteriaValue) => {
+      if (depth < 0 || depth > 10) return;
+      if (limit < 0) return;
+
+      const nextUrl = `/?address=${address}&depth=${depth}&limit=${limit}&from=${from.toISOString()}&to=${to.toISOString()}`;
+
+      if (validateAddress(address) !== ValidationResult.VALID) {
+        router.replace(nextUrl);
+      } else {
+        router.push(nextUrl);
+      }
+    },
+    [router]
+  );
+
+  return useMemo(
+    () => ({
+      criteria,
+      onCriteriaChange: handleCriteriaChange,
+      transactions,
+      isLoading,
+    }),
+    [criteria, handleCriteriaChange, transactions, isLoading]
+  );
+};
+
+export default function Home() {
+  const { address } = useRouter().query;
+  const { criteria, onCriteriaChange, transactions, isLoading } =
+    useFetchTransactions();
 
   return (
     <>
@@ -80,8 +104,17 @@ export default function Home() {
         </div>
       </header>
       <div className={styles.container}>
-        <Criteria value={criteria} onChange={handleCriteriaChange} />
-        <Graph transactions={transactions} rootAddress={address as string} />
+        <Criteria
+          value={criteria}
+          onChange={onCriteriaChange}
+          disabled={isLoading}
+        />
+        <div className={styles.graphContainer}>
+          <Graph transactions={transactions} rootAddress={address as string} />
+          <div className={`${styles.loader} ${isLoading ? styles.show : ""}`}>
+            <CircularProgress />
+          </div>
+        </div>
         <Transactions transactions={transactions} />
       </div>
       <footer className={styles.footer}>
