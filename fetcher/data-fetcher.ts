@@ -1,10 +1,6 @@
 import { Tzkt } from "./tezos/tzkt/api";
 import { Transaction } from "../model/transaction";
-import { Wallet } from "../model/wallet";
-import { isUserWallet } from "./tezos/util/tezosUtil";
-
-const DEFAULT_DEPTH = 1;
-const DEFAULT_LIMIT = 20;
+import { Wallet, WalletType } from "../model/wallet";
 
 export interface Node {
   wallet: Wallet;
@@ -29,7 +25,7 @@ async function fetchTransactions(
   let results = [];
 
   for (let wallet of wallets) {
-    if (isUserWallet(wallet)) {
+    if (wallet.type === WalletType.User) {
       let fetcher = new Tzkt();
 
       const data = await fetcher.get({
@@ -125,8 +121,8 @@ export default async function getTransactions(
   wallets: Wallet[],
   start: Date,
   end: Date,
-  depth = DEFAULT_DEPTH,
-  limit = DEFAULT_LIMIT
+  depth,
+  limit
 ): Promise<Transaction[]> {
   const transactions = [];
 

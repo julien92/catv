@@ -9,7 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import { validateAddress, ValidationResult } from "@taquito/utils";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import { Wallet } from "../model/wallet";
+import { Wallet, WalletType } from "../model/wallet";
 import moment from "moment";
 import getTransactions from "../fetcher/data-fetcher";
 
@@ -40,7 +40,7 @@ export default function Home() {
 
     /* TODO Cancel fetch on criteria change */
     getTransactions(
-      [{ address: criteria.address } as Wallet],
+      [{ address: criteria.address, type: WalletType.User } as Wallet],
       criteria.from,
       criteria.to,
       criteria.depth,
