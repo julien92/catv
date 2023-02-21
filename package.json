@@ -14,7 +14,7 @@
     "@emotion/styled": "^11.10.5",
     "@mui/material": "^5.11.8",
     "@mui/x-data-grid": "^5.17.23",
-    "@mui/x-date-pickers": "^5.0.17",
+    "@mui/x-date-pickers": "^5.0.19",
     "@next/font": "13.1.1",
     "@taquito/utils": "15.0.1",
     "@vercel/analytics": "^0.1.8",
