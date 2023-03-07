@@ -27,7 +27,7 @@
     "react-dom": "18.2.0",
     "react-force-graph": "^1.42.0",
     "three": "^0.149.0",
-    "three-spritetext": "^1.6.5"
+    "three-spritetext": "^1.8.0"
   },
   "devDependencies": {
     "@types/node": "18.14.0",
