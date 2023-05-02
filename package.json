@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@date-io/moment": "^2.16.1",
-    "@emotion/react": "^11.10.5",
+    "@emotion/react": "^11.10.8",
     "@emotion/styled": "^11.10.6",
     "@mui/material": "^5.11.8",
     "@mui/x-data-grid": "^5.17.25",
