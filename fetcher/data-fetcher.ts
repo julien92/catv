@@ -1,6 +1,7 @@
 import { Tzkt } from "./tezos/tzkt/api";
 import { Transaction } from "../model/transaction";
 import { Wallet, WalletType } from "../model/wallet";
+import {Etherscan} from "./eth/etherscan/api";
 
 export interface Node {
   wallet: Wallet;
@@ -24,9 +25,10 @@ async function fetchTransactions(
 ) {
   let results = [];
 
+  console.log('fetch transactions')
   for (let wallet of wallets) {
     if (wallet.type === WalletType.User) {
-      let fetcher = new Tzkt();
+      let fetcher = new Etherscan();
 
       const data = await fetcher.get({
         address: wallet.address,
@@ -59,6 +61,7 @@ async function fetchUniqueWallet(
   direction: Direction.IN | Direction.OUT,
   limit: number
 ): Promise<Wallet[]> {
+  console.log("fetch tarnsactions");
   const tx = await fetchTransactions(
     wallets,
     transactions,

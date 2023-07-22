@@ -33,7 +33,8 @@ const useFetchTransactions = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (validateAddress(criteria.address) !== ValidationResult.VALID) return;
+    if ( //TODO FIXME ADD CROSSCHAIN COMPATIBILITY
+        false && (validateAddress(criteria.address) !== ValidationResult.VALID)) return;
     if (criteria.depth < 1 || criteria.depth > 10) return;
     if (criteria.limit < 1) return;
     if (criteria.from > criteria.to) return;
@@ -63,7 +64,9 @@ const useFetchTransactions = () => {
 
       const nextUrl = `/?address=${address}&depth=${depth}&limit=${limit}&from=${from.toISOString()}&to=${to.toISOString()}`;
 
-      if (validateAddress(address) !== ValidationResult.VALID) {
+      if (
+          // FIXME CROSSCHAIN COMPATIBLITY
+          false && validateAddress(address) !== ValidationResult.VALID) {
         router.replace(nextUrl);
       } else {
         router.push(nextUrl);

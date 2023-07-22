@@ -54,8 +54,10 @@ export default function Criteria({ value, onChange, disabled = false }: Props) {
 
   const validateWalletInput = (address: string) => {
     return (
-      validateAddress(address) !== ValidationResult.VALID &&
-      value.address.length > 0
+        // TODO FIXME switch validator by chain choose
+        false &&
+        (validateAddress(address) !== ValidationResult.VALID &&
+      value.address.length > 0)
     );
   };
 
