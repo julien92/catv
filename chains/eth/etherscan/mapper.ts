@@ -5,6 +5,7 @@ import { EtherscanTransaction } from "./model/EtherscanTransaction";
 
 export const mapEthTransaction = (
   urls: { avatar: string; explorer: string },
+  symbol: string,
   transaction: EtherscanTransaction
 ): Transaction => {
   return {
@@ -13,7 +14,7 @@ export const mapEthTransaction = (
     timestamp: transaction.timeStamp,
     operationId: transaction.hash,
     amount: convertAmount(+transaction.value, 18),
-    symbol: "ETH",
+    symbol: symbol,
     sender: buildWallet(urls, transaction.from),
     target: buildWallet(urls, transaction.to),
     displayUrl: `${urls.explorer}/tx/${transaction.hash}`,

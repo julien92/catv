@@ -21,12 +21,14 @@ const FETCHER_MAP: Record<Chain, fetcher> = {
   eth: new Etherscan(
     "https://api.etherscan.io/api",
     "V5VMR4K591VVWZW723XWVRKT6P2BGCS9HN",
-    { avatar: "https://effigy.im/a", explorer: "https://etherscan.io" }
+    { avatar: "https://effigy.im/a", explorer: "https://etherscan.io" },
+    "ETH"
   ),
   bnb: new Etherscan(
     "https://api.bscscan.com/api",
     "TAJ7576G5TEGSQVUGUR4ESNI7IZRGZMK4B",
-    { avatar: "https://effigy.im/a", explorer: "https://bscscan.com" }
+    { avatar: "https://effigy.im/a", explorer: "https://bscscan.com" },
+    "BNB"
   ),
 };
 

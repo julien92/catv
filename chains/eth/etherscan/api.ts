@@ -11,15 +11,18 @@ export class Etherscan implements fetcher {
     avatar: string;
     explorer: string;
   };
+  private symbol: string;
 
   constructor(
     apiUrl: string,
     apiKey: string,
-    urls: { avatar: string; explorer: string }
+    urls: { avatar: string; explorer: string },
+    symbol: string
   ) {
     this.apiUrl = apiUrl;
     this.apiKey = apiKey;
     this.urls = urls;
+    this.symbol = symbol;
   }
 
   async get(criteria: Criteria): Promise<Transaction[]> {
@@ -33,6 +36,6 @@ export class Etherscan implements fetcher {
       `${this.apiUrl}/?module=account&apikey=${this.apiKey}&action=txlist&address=${criteria.address}`
     );
 
-    return data.result.map((t) => mapEthTransaction(this.urls, t));
+    return data.result.map((t) => mapEthTransaction(this.urls, this.symbol, t));
   }
 }
