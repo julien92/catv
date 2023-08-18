@@ -5,6 +5,7 @@ import { Chain } from "./fetcher";
 const VALIDATOR_BY_CHAIN: Record<Chain, (address: string) => boolean> = {
   tezos: tezosValidateAddress,
   eth: ethValidateAddress,
+  bnb: ethValidateAddress,
 };
 
 const validateAddress = (chain: Chain, address: string) => {

@@ -39,5 +39,6 @@ export function isExchangeWallet(wallet: { address: string; alias: string }) {
 }
 
 export function validateAddress(address: string) {
+  /* TODO Make it better */
   return address.length === 42 && address.startsWith("0x");
 }

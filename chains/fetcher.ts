@@ -12,4 +12,4 @@ export interface Criteria {
   limit: number;
 }
 
-export type Chain = "tezos" | "eth";
+export type Chain = "tezos" | "eth" | "bnb";

@@ -4,10 +4,24 @@ import { Transaction } from "../../../model/transaction";
 import { ApiResponse } from "./model/EtherscanTransaction";
 import { mapEthTransaction } from "./mapper";
 
-const API_URL = "https://api.etherscan.io/api";
-const API_KEY = "V5VMR4K591VVWZW723XWVRKT6P2BGCS9HN";
-
 export class Etherscan implements fetcher {
+  private apiUrl: string;
+  private apiKey: string;
+  private urls: {
+    avatar: string;
+    explorer: string;
+  };
+
+  constructor(
+    apiUrl: string,
+    apiKey: string,
+    urls: { avatar: string; explorer: string }
+  ) {
+    this.apiUrl = apiUrl;
+    this.apiKey = apiKey;
+    this.urls = urls;
+  }
+
   async get(criteria: Criteria): Promise<Transaction[]> {
     const tx1 = this.getEthTransactions(criteria);
 
@@ -16,9 +30,9 @@ export class Etherscan implements fetcher {
 
   async getEthTransactions(criteria: Criteria): Promise<Transaction[]> {
     const { data } = await axios.get<ApiResponse>(
-      `${API_URL}/?module=account&apikey=${API_KEY}&action=txlist&address=${criteria.address}`
+      `${this.apiUrl}/?module=account&apikey=${this.apiKey}&action=txlist&address=${criteria.address}`
     );
 
-    return data.result.map((t) => mapEthTransaction(t));
+    return data.result.map((t) => mapEthTransaction(this.urls, t));
   }
 }

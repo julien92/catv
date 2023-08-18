@@ -4,6 +4,7 @@ import { TokenTransaction } from "../../tezos/tzkt/model/TokenTransaction";
 import { EtherscanTransaction } from "./model/EtherscanTransaction";
 
 export const mapEthTransaction = (
+  urls: { avatar: string; explorer: string },
   transaction: EtherscanTransaction
 ): Transaction => {
   return {
@@ -13,19 +14,22 @@ export const mapEthTransaction = (
     operationId: transaction.hash,
     amount: convertAmount(+transaction.value, 18),
     symbol: "ETH",
-    sender: buildWallet(transaction.from),
-    target: buildWallet(transaction.to),
-    displayUrl: `https://etherscan.io/tx/${transaction.hash}`,
+    sender: buildWallet(urls, transaction.from),
+    target: buildWallet(urls, transaction.to),
+    displayUrl: `${urls.explorer}/tx/${transaction.hash}`,
   };
 };
 
-const buildWallet = (address: string) => {
+const buildWallet = (
+  urls: { avatar: string; explorer: string },
+  address: string
+) => {
   return {
     alias: undefined,
     address: address,
     type: WalletType.User,
-    avatarUrl: `https://effigy.im/a/${address}.png`,
-    displayUrl: `https://etherscan.io/address/${address}`,
+    avatarUrl: `${urls.avatar}/${address}.png`,
+    displayUrl: `${urls.explorer}/address/${address}`,
   };
 };
 

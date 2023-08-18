@@ -18,7 +18,16 @@ enum Direction {
 
 const FETCHER_MAP: Record<Chain, fetcher> = {
   tezos: new Tzkt(),
-  eth: new Etherscan(),
+  eth: new Etherscan(
+    "https://api.etherscan.io/api",
+    "V5VMR4K591VVWZW723XWVRKT6P2BGCS9HN",
+    { avatar: "https://effigy.im/a", explorer: "https://etherscan.io" }
+  ),
+  bnb: new Etherscan(
+    "https://api.bscscan.com/api",
+    "TAJ7576G5TEGSQVUGUR4ESNI7IZRGZMK4B",
+    { avatar: "https://effigy.im/a", explorer: "https://bscscan.com" }
+  ),
 };
 
 async function fetchTransactions(
