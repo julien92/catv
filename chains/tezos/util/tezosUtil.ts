@@ -1,3 +1,8 @@
+import {
+  ValidationResult,
+  validateAddress as taquitoValidateAddress,
+} from "@taquito/utils";
+
 import { Wallet, WalletType } from "../../../model/wallet";
 
 const exchangeAliases = [
@@ -40,4 +45,8 @@ export function getWalletType(wallet: Wallet) {
   }
 
   return walletType;
+}
+
+export function validateAddress(address: string) {
+  return taquitoValidateAddress(address) === ValidationResult.VALID;
 }

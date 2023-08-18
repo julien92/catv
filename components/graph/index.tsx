@@ -25,7 +25,7 @@ const strokeStyleByWalletType: Map<WalletType, string> = new Map([
 ]);
 
 const onNodeClick = (node: NodeGraph) => {
-  window.open(`https://tzkt.io/${node.id}`, "_blank");
+  window.open(node.displayUrl, "_blank");
 };
 
 const nodeLabel = (node: any) => {

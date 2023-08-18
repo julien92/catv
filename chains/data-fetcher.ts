@@ -1,7 +1,8 @@
 import { Tzkt } from "./tezos/tzkt/api";
 import { Transaction } from "../model/transaction";
 import { Wallet, WalletType } from "../model/wallet";
-import {Etherscan} from "./eth/etherscan/api";
+import { Etherscan } from "./eth/etherscan/api";
+import { Chain, fetcher } from "./fetcher";
 
 export interface Node {
   wallet: Wallet;
@@ -15,7 +16,13 @@ enum Direction {
   BOTH,
 }
 
+const FETCHER_MAP: Record<Chain, fetcher> = {
+  tezos: new Tzkt(),
+  eth: new Etherscan(),
+};
+
 async function fetchTransactions(
+  chain: Chain,
   wallets: Wallet[],
   transactions: Transaction[],
   start: Date,
@@ -24,12 +31,10 @@ async function fetchTransactions(
   limit: number
 ) {
   let results = [];
+  const fetcher = FETCHER_MAP[chain];
 
-  console.log('fetch transactions')
   for (let wallet of wallets) {
     if (wallet.type === WalletType.User) {
-      let fetcher = new Etherscan();
-
       const data = await fetcher.get({
         address: wallet.address,
         type,
@@ -54,6 +59,7 @@ function sleep(ms) {
 }
 
 async function fetchUniqueWallet(
+  chain: Chain,
   wallets: Wallet[],
   transactions: Transaction[],
   start: Date,
@@ -61,8 +67,8 @@ async function fetchUniqueWallet(
   direction: Direction.IN | Direction.OUT,
   limit: number
 ): Promise<Wallet[]> {
-  console.log("fetch tarnsactions");
   const tx = await fetchTransactions(
+    chain,
     wallets,
     transactions,
     start,
@@ -84,6 +90,7 @@ async function fetchUniqueWallet(
 }
 
 async function fetchChildTransactions(
+  chain: Chain,
   wallets: Wallet[],
   transactions: Transaction[],
   start: Date,
@@ -95,6 +102,7 @@ async function fetchChildTransactions(
   if (count < 0) return [];
 
   const uniqueWallets = await fetchUniqueWallet(
+    chain,
     wallets,
     transactions,
     start,
@@ -104,6 +112,7 @@ async function fetchChildTransactions(
   );
 
   const children = await fetchChildTransactions(
+    chain,
     uniqueWallets,
     transactions,
     start,
@@ -121,6 +130,7 @@ async function fetchChildTransactions(
 }
 
 export default async function getTransactions(
+  chain: Chain,
   wallets: Wallet[],
   start: Date,
   end: Date,
@@ -130,6 +140,7 @@ export default async function getTransactions(
   const transactions = [];
 
   await fetchChildTransactions(
+    chain,
     wallets,
     transactions,
     start,
@@ -140,6 +151,7 @@ export default async function getTransactions(
   );
 
   await fetchChildTransactions(
+    chain,
     wallets,
     transactions,
     start,

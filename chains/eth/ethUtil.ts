@@ -1,4 +1,4 @@
-import {Wallet, WalletType} from "../../model/wallet";
+import { Wallet, WalletType } from "../../model/wallet";
 
 export function getWalletType(wallet: Wallet) {
   let walletType = WalletType.User;
@@ -31,9 +31,13 @@ export function isSmartContract(address: string) {
 
 export function isExchangeWallet(wallet: { address: string; alias: string }) {
   return (
-      wallet.alias &&
-      exchangeAliases.find((exchangeAlias) =>
-          wallet.alias.toLowerCase().includes(exchangeAlias)
-      )
+    wallet.alias &&
+    exchangeAliases.find((exchangeAlias) =>
+      wallet.alias.toLowerCase().includes(exchangeAlias)
+    )
   );
+}
+
+export function validateAddress(address: string) {
+  return address.length === 42 && address.startsWith("0x");
 }

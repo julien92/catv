@@ -11,3 +11,5 @@ export interface Criteria {
   end: Date;
   limit: number;
 }
+
+export type Chain = "tezos" | "eth";

@@ -5,22 +5,24 @@ import Graph from "../components/graph";
 import Transactions from "../components/transactions";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { validateAddress, ValidationResult } from "@taquito/utils";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { Wallet, WalletType } from "../model/wallet";
 import moment from "moment";
-import getTransactions from "../fetcher/data-fetcher";
+import getTransactions from "../chains/data-fetcher";
 import { CircularProgress } from "@mui/material";
-import { style } from "@mui/system";
+
+import { Chain } from "../chains/fetcher";
+import validateAddress from "../chains/validator";
 
 const useFetchTransactions = () => {
   const [transactions, setTransactions] = useState([]);
   const router = useRouter();
-  const { address, depth, limit, from, to } = useRouter().query;
+  const { address, chain, depth, limit, from, to } = useRouter().query;
   const criteria: CriteriaValue = useMemo(
     () => ({
       address: (address as string) || "",
+      chain: (chain as Chain) || "tezos",
       depth: parseInt(depth as string) || 1,
       limit: parseInt(limit as string) || 20,
       from: from
@@ -28,13 +30,12 @@ const useFetchTransactions = () => {
         : moment().subtract(1, "years").toDate(),
       to: to ? new Date(to as string) : new Date(),
     }),
-    [address, depth, limit, from, to]
+    [address, chain, depth, limit, from, to]
   );
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if ( //TODO FIXME ADD CROSSCHAIN COMPATIBILITY
-        false && (validateAddress(criteria.address) !== ValidationResult.VALID)) return;
+    if (!validateAddress(criteria.chain, criteria.address)) return;
     if (criteria.depth < 1 || criteria.depth > 10) return;
     if (criteria.limit < 1) return;
     if (criteria.from > criteria.to) return;
@@ -43,6 +44,7 @@ const useFetchTransactions = () => {
 
     setIsLoading(true);
     getTransactions(
+      criteria.chain,
       [{ address: criteria.address, type: WalletType.User } as Wallet],
       criteria.from,
       criteria.to,
@@ -58,15 +60,13 @@ const useFetchTransactions = () => {
   }, [criteria]);
 
   const handleCriteriaChange = useCallback(
-    ({ address, depth, limit, from, to }: CriteriaValue) => {
+    ({ address, chain, depth, limit, from, to }: CriteriaValue) => {
       if (depth < 0 || depth > 10) return;
       if (limit < 0) return;
 
-      const nextUrl = `/?address=${address}&depth=${depth}&limit=${limit}&from=${from.toISOString()}&to=${to.toISOString()}`;
+      const nextUrl = `/?address=${address}&chain=${chain}&depth=${depth}&limit=${limit}&from=${from.toISOString()}&to=${to.toISOString()}`;
 
-      if (
-          // FIXME CROSSCHAIN COMPATIBLITY
-          false && validateAddress(address) !== ValidationResult.VALID) {
+      if (!validateAddress(criteria.chain, address)) {
         router.replace(nextUrl);
       } else {
         router.push(nextUrl);
