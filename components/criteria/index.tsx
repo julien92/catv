@@ -7,14 +7,17 @@ import {
 } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { validateAddress, ValidationResult } from "@taquito/utils";
 import moment, { Moment } from "moment";
-import { ChangeEvent, useMemo } from "react";
+import { ChangeEvent, useCallback, useMemo } from "react";
+
+import { Chain } from "../../chains/fetcher";
 
 import styles from "./styles.module.css";
+import validateAddress from "../../chains/validator";
 
 export interface CriteriaValue {
   address: string;
+  chain: Chain;
   depth: number;
   limit: number;
   from: Date;
@@ -30,6 +33,10 @@ interface Props {
 export default function Criteria({ value, onChange, disabled = false }: Props) {
   const handleAddressChange = (event: ChangeEvent<HTMLInputElement>) => {
     onChange({ ...value, address: event.target.value });
+  };
+
+  const handleChainChange = (event: SelectChangeEvent<string>) => {
+    onChange({ ...value, chain: event.target.value as Chain });
   };
 
   const handleDepthChange = (event: SelectChangeEvent<number>) => {
@@ -52,12 +59,11 @@ export default function Criteria({ value, onChange, disabled = false }: Props) {
     onChange({ ...value, to: v.toDate() });
   };
 
-  const validateWalletInput = (address: string) => {
-    return (
-      validateAddress(address) !== ValidationResult.VALID &&
-      value.address.length > 0
-    );
-  };
+  const validateWalletInput = useCallback(
+    (address: string) =>
+      value.address.length > 0 && !validateAddress(value.chain, address),
+    [value.chain, value.address]
+  );
 
   const minDateTime = useMemo(() => moment(value.from), [value.from]);
   const maxDateTime = useMemo(() => moment(value.to), [value.to]);
@@ -73,12 +79,27 @@ export default function Criteria({ value, onChange, disabled = false }: Props) {
         className={styles.addressInput}
         helperText={
           validateWalletInput(value.address)
-            ? "Please enter a valid tezos address"
+            ? "Please enter a valid address"
             : ""
         }
         variant="standard"
         disabled={disabled}
       />
+
+      <FormControl className={styles.depthSelect} size="small">
+        <InputLabel>Chain</InputLabel>
+        <Select
+          value={value.chain}
+          label="Chain"
+          onChange={handleChainChange}
+          disabled={disabled}
+        >
+          <MenuItem value="tezos">Tezos</MenuItem>
+          <MenuItem value="eth">Ethereum</MenuItem>
+          <MenuItem value="bnb">BNB</MenuItem>
+        </Select>
+      </FormControl>
+
       <FormControl className={styles.depthSelect} size="small">
         <InputLabel>Depth</InputLabel>
         <Select

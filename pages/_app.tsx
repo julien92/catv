@@ -1,6 +1,6 @@
 import "../styles/globals.css";
 // pages/_app.js
-import { Roboto } from "@next/font/google";
+import { Roboto } from "next/font/google";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
