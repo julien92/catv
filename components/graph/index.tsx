@@ -79,11 +79,11 @@ export default function Graphs({ transactions, rootAddress }: Props) {
     const map = {};
 
     transactions.forEach((transaction) => {
-      if (!map[transaction.sender.address]) {
+      if (transaction.sender.address && !map[transaction.sender.address]) {
         map[transaction.sender.address] = new Image();
         map[transaction.sender.address].src = transaction.sender.avatarUrl;
       }
-      if (!map[transaction.target.address]) {
+      if (transaction.target.address && !map[transaction.target.address]) {
         map[transaction.target.address] = new Image();
         map[transaction.target.address].src = transaction.target.avatarUrl;
       }

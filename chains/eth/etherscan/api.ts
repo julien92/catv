@@ -33,9 +33,15 @@ export class Etherscan implements fetcher {
 
   async getEthTransactions(criteria: Criteria): Promise<Transaction[]> {
     const { data } = await axios.get<ApiResponse>(
-      `${this.apiUrl}/?module=account&apikey=${this.apiKey}&action=txlist&address=${criteria.address}`
+      `${this.apiUrl}/?module=account&apikey=${this.apiKey}&action=txlist&address=${criteria.address}&page=1&offset=${criteria.limit}`
     );
 
-    return data.result.map((t) => mapEthTransaction(this.urls, this.symbol, t));
+    if (data.message === "NOTOK") return [];
+
+    const result = data.result.map((t) =>
+      mapEthTransaction(this.urls, this.symbol, t)
+    );
+
+    return result;
   }
 }
