@@ -101,8 +101,12 @@ export default function Home() {
       </Head>
       <header>
         <div className={styles.header}>
-          <Image src="tezos_logo.svg" alt="logo" width={60} height={60} />
-          <div className={styles.separator}>-</div>
+          {criteria.chain === 'tezos' && (
+              <>
+                <Image src="tezos_logo.svg" alt="logo" width={60} height={60} />
+                <div className={styles.separator}>-</div>
+              </>
+          )}
           <div>CATV</div>
         </div>
       </header>
@@ -122,10 +126,14 @@ export default function Home() {
       </div>
       <footer className={styles.footer}>
         <div>
-          Powered by TzKT API{" "}
-          <a href="https://tzkt.io" target="_blank" rel="noreferrer">
-            tzkt.io
-          </a>
+          {criteria.chain === 'tezos' && (
+              <>
+                Powered by TzKT API{" "}
+                <a href="https://tzkt.io" target="_blank" rel="noreferrer">
+                  tzkt.io
+                </a>
+              </>
+          )}
         </div>
       </footer>
     </>
