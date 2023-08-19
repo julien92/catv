@@ -101,12 +101,7 @@ export default function Home() {
       </Head>
       <header>
         <div className={styles.header}>
-          {criteria.chain === 'tezos' && (
-              <>
-                <Image src="tezos_logo.svg" alt="logo" width={60} height={60} />
-                <div className={styles.separator}></div>
-              </>
-          )}
+          <Image src="/scope.png" alt="logo" width={60} height={60} />
           <div>Scope</div>
         </div>
       </header>
