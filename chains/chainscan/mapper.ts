@@ -1,12 +1,11 @@
-import { Transaction } from "../../../model/transaction";
-import { WalletType } from "../../../model/wallet";
-import { TokenTransaction } from "../../tezos/tzkt/model/TokenTransaction";
-import { EtherscanTransaction } from "./model/EtherscanTransaction";
+import { Transaction } from "../../model/transaction";
+import { WalletType } from "../../model/wallet";
+import { ChainScanTransaction } from "./model/ChainScanTransaction";
 
-export const mapEthTransaction = (
+export const mapTransaction = (
   urls: { avatar: string; explorer: string },
   symbol: string,
-  transaction: EtherscanTransaction
+  transaction: ChainScanTransaction
 ): Transaction => {
   return {
     ...transaction,
@@ -34,12 +33,6 @@ const buildWallet = (
   };
 };
 
-const convertTokenAmount = (tokenTransaction: TokenTransaction) => {
-  return convertAmount(
-    +tokenTransaction.amount,
-    +tokenTransaction.token.metadata?.decimals || 0
-  );
-};
 
 const convertAmount = (amount: number, decimal: number) => {
   return amount / 10 ** decimal;

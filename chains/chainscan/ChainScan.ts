@@ -1,10 +1,10 @@
 import axios from "axios";
-import { Criteria, fetcher } from "../../fetcher";
-import { Transaction } from "../../../model/transaction";
-import { ApiResponse } from "./model/EtherscanTransaction";
-import { mapEthTransaction } from "./mapper";
+import { Criteria, fetcher } from "../fetcher";
+import { Transaction } from "../../model/transaction";
+import { ApiResponse } from "./model/ChainScanTransaction";
+import { mapTransaction } from "./mapper";
 
-export class Etherscan implements fetcher {
+export class ChainScan implements fetcher {
   private apiUrl: string;
   private apiKey: string;
   private urls: {
@@ -26,12 +26,12 @@ export class Etherscan implements fetcher {
   }
 
   async get(criteria: Criteria): Promise<Transaction[]> {
-    const tx1 = this.getEthTransactions(criteria);
+    const tx1 = this.getTransactions(criteria);
 
     return await tx1;
   }
 
-  async getEthTransactions(criteria: Criteria): Promise<Transaction[]> {
+  async getTransactions(criteria: Criteria): Promise<Transaction[]> {
     const { data } = await axios.get<ApiResponse>(
       `${this.apiUrl}/?module=account&apikey=${this.apiKey}&action=txlist&address=${criteria.address}&page=1&offset=${criteria.limit}`
     );
@@ -39,7 +39,7 @@ export class Etherscan implements fetcher {
     if (data.message === "NOTOK") return [];
 
     const result = data.result.map((t) =>
-      mapEthTransaction(this.urls, this.symbol, t)
+      mapTransaction(this.urls, this.symbol, t)
     );
 
     return result;

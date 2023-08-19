@@ -1,4 +1,4 @@
-export interface EtherscanTransaction {
+export interface ChainScanTransaction {
   blockNumber: string;
   timeStamp: string;
   hash: string;
@@ -18,6 +18,6 @@ export interface EtherscanTransaction {
 export interface ApiResponse {
   status: string;
   message: string;
-  result: EtherscanTransaction[];
+  result: ChainScanTransaction[];
 }
 
