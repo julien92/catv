@@ -7,10 +7,15 @@ export const mapTransaction = (
   symbol: string,
   transaction: ChainScanTransaction
 ): Transaction => {
+  function getUTCdate(timeStamp: string) {
+    const date = new Date(parseInt(timeStamp) * 1000)
+    return date.toUTCString();
+  }
+
   return {
     ...transaction,
     id: transaction.hash,
-    timestamp: transaction.timeStamp,
+    timestamp: getUTCdate(transaction.timeStamp),
     operationId: transaction.hash,
     amount: convertAmount(+transaction.value, 18),
     symbol: symbol,
