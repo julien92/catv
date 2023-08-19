@@ -4,6 +4,7 @@ import { Wallet, WalletType } from "../model/wallet";
 import { Chain, fetcher } from "./fetcher";
 import {BscScan} from "./bnb/bscscan/BscScan";
 import {EtherScan} from "./eth/etherscan/EtherScan";
+import {PolygonScan} from "./matic/polygonscan/PolygonScan";
 
 export interface Node {
   wallet: Wallet;
@@ -21,6 +22,7 @@ const FETCHER_MAP: Record<Chain, fetcher> = {
   tezos: new Tzkt(),
   eth: new EtherScan(),
   bnb: new BscScan(),
+  matic: new PolygonScan()
 };
 
 async function fetchTransactions(

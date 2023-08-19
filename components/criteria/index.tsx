@@ -97,6 +97,7 @@ export default function Criteria({ value, onChange, disabled = false }: Props) {
           <MenuItem value="tezos">Tezos</MenuItem>
           <MenuItem value="eth">Ethereum</MenuItem>
           <MenuItem value="bnb">BNB</MenuItem>
+          <MenuItem value="matic">Polygon</MenuItem>
         </Select>
       </FormControl>
 
