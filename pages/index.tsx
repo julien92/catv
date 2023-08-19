@@ -94,7 +94,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>CATV</title>
+        <title>Scope</title>
         <meta name="description" content="Crypto Analyzer Transaction Viewer" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
@@ -104,10 +104,10 @@ export default function Home() {
           {criteria.chain === 'tezos' && (
               <>
                 <Image src="tezos_logo.svg" alt="logo" width={60} height={60} />
-                <div className={styles.separator}>-</div>
+                <div className={styles.separator}></div>
               </>
           )}
-          <div>CATV</div>
+          <div>Scope</div>
         </div>
       </header>
       <div className={styles.container}>
