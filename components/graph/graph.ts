@@ -25,7 +25,6 @@ export const buildGraph = (
   rootAddress: string
 ): Graph => {
   const wallets = [];
-
   transactions.forEach((t) => {
     wallets.push(t.sender);
     wallets.push(t.target);
@@ -37,7 +36,7 @@ export const buildGraph = (
       alias: wallet.alias,
       walletType: wallet.type,
       val: 1,
-      isRootAddress: wallet.address === rootAddress,
+      isRootAddress: wallet.address.toLowerCase() === rootAddress.toLowerCase(),
       avatarUrl: wallet.avatarUrl,
       displayUrl: wallet.displayUrl,
     };
