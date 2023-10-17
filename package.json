@@ -30,7 +30,7 @@
     "web3-validator": "^2.0.0"
   },
   "devDependencies": {
-    "@types/node": "18.14.0",
+    "@types/node": "20.8.6",
     "@types/react": "18.0.28",
     "@types/three": "^0.149.0"
   }
