@@ -1,19 +1,148 @@
+/* Criteria Wrapper */
+.criteriaWrapper {
+  width: 100%;
+  padding: 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+/* Criteria Container */
 .criteria {
   display: flex;
-  flex-direction: row;
-  gap: 1rem;
-  align-self: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-start;
 }
 
+/* Chain Select */
+.chainSelect {
+  min-width: 170px;
+  flex-shrink: 0;
+}
+
+/* Address Input */
 .addressInput {
-  min-width: 360px !important;
+  flex: 1;
+  min-width: 280px;
 }
 
+/* Depth & Limit Selects */
 .depthSelect,
 .limitSelect {
-  min-width: 96px !important;
+  width: 100px;
+  flex-shrink: 0;
+}
+
+/* Date Range Container */
+.dateRange {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.dateSeparator {
+  color: var(--text-dim);
+  font-size: 0.75rem;
 }
 
 .dateSelect {
-  min-width: 248px !important;
+  width: 150px;
+  flex-shrink: 0;
+}
+
+.datePicker {
+  width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .criteriaWrapper {
+    padding: 0.875rem;
+  }
+
+  .addressInput {
+    min-width: 240px;
+  }
+}
+
+@media (max-width: 900px) {
+  .criteria {
+    gap: 0.625rem;
+  }
+
+  .chainSelect {
+    min-width: 150px;
+  }
+
+  .addressInput {
+    min-width: 100%;
+    order: -1;
+  }
+
+  .dateRange {
+    width: 100%;
+  }
+
+  .dateSelect {
+    flex: 1;
+    min-width: 130px;
+  }
+}
+
+@media (max-width: 600px) {
+  .criteriaWrapper {
+    padding: 0.75rem;
+  }
+
+  .criteria {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .chainSelect,
+  .addressInput,
+  .depthSelect,
+  .limitSelect {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .dateRange {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+
+  .dateSeparator {
+    display: none;
+  }
+
+  .dateSelect {
+    width: 100%;
+  }
+}
+
+/* Input styling */
+.criteriaWrapper :global(.MuiOutlinedInput-root) {
+  transition: border-color 0.15s ease;
+  font-size: 0.85rem;
+}
+
+.criteriaWrapper :global(.MuiOutlinedInput-root:hover) {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.criteriaWrapper :global(.MuiOutlinedInput-root.Mui-focused) {
+  border-color: var(--color-primary);
+}
+
+.criteriaWrapper :global(.MuiInputLabel-root) {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.criteriaWrapper :global(.MuiInputLabel-root.Mui-focused) {
+  color: var(--color-primary);
 }

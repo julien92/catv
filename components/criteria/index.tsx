@@ -4,6 +4,9 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  InputAdornment,
+  Box,
+  Chip,
 } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -30,13 +33,55 @@ interface Props {
   disabled?: boolean;
 }
 
+const chainConfig: Record<Chain, { label: string; color: string; icon: string }> = {
+  tezos: { label: "Tezos", color: "#0D61FF", icon: "XTZ" },
+  eth: { label: "Ethereum", color: "#627EEA", icon: "ETH" },
+  bnb: { label: "BNB Chain", color: "#F3BA2F", icon: "BNB" },
+  matic: { label: "Polygon", color: "#8247E5", icon: "MATIC" },
+};
+
+const menuProps = {
+  PaperProps: {
+    sx: {
+      maxHeight: 300,
+      mt: 0.5,
+      "& .MuiMenuItem-root": {
+        py: 1.5,
+        px: 2,
+        "&:hover": {
+          backgroundColor: "rgba(139, 92, 246, 0.1)",
+        },
+        "&.Mui-selected": {
+          backgroundColor: "rgba(139, 92, 246, 0.2)",
+          "&:hover": {
+            backgroundColor: "rgba(139, 92, 246, 0.25)",
+          },
+        },
+      },
+    },
+  },
+  MenuListProps: {
+    sx: {
+      py: 0.5,
+    },
+  },
+  anchorOrigin: {
+    vertical: "bottom" as const,
+    horizontal: "left" as const,
+  },
+  transformOrigin: {
+    vertical: "top" as const,
+    horizontal: "left" as const,
+  },
+};
+
 export default function Criteria({ value, onChange, disabled = false }: Props) {
   const handleAddressChange = (event: ChangeEvent<HTMLInputElement>) => {
     onChange({ ...value, address: event.target.value });
   };
 
   const handleChainChange = (event: SelectChangeEvent<string>) => {
-    onChange({ ...value, chain: event.target.value as Chain });
+    onChange({ ...value, chain: event.target.value as Chain, address: "" });
   };
 
   const handleDepthChange = (event: SelectChangeEvent<number>) => {
@@ -49,13 +94,11 @@ export default function Criteria({ value, onChange, disabled = false }: Props) {
 
   const handleDateFromChange = (v: Moment | null) => {
     if (!v?.isValid()) return;
-
     onChange({ ...value, from: v.toDate() });
   };
 
   const handleDateToChange = (v: Moment | null) => {
     if (!v?.isValid()) return;
-
     onChange({ ...value, to: v.toDate() });
   };
 
@@ -68,87 +111,168 @@ export default function Criteria({ value, onChange, disabled = false }: Props) {
   const minDateTime = useMemo(() => moment(value.from), [value.from]);
   const maxDateTime = useMemo(() => moment(value.to), [value.to]);
 
+  const currentChain = chainConfig[value.chain];
+
   return (
-    <div className={styles.criteria}>
-      <TextField
-        error={validateWalletInput(value.address)}
-        placeholder="Wallet address"
-        fullWidth
-        value={value.address}
-        onChange={handleAddressChange}
-        className={styles.addressInput}
-        helperText={
-          validateWalletInput(value.address)
-            ? "Please enter a valid address"
-            : ""
-        }
-        variant="standard"
-        disabled={disabled}
-      />
+    <div className={styles.criteriaWrapper}>
+      <div className={styles.criteria}>
+        {/* Chain Selection */}
+        <FormControl className={styles.chainSelect} size="small">
+          <InputLabel id="chain-label">Chain</InputLabel>
+          <Select
+            labelId="chain-label"
+            value={value.chain}
+            label="Chain"
+            onChange={handleChainChange}
+            disabled={disabled}
+            MenuProps={menuProps}
+            renderValue={(selected) => (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Chip
+                  label={chainConfig[selected as Chain].icon}
+                  size="small"
+                  sx={{
+                    backgroundColor: chainConfig[selected as Chain].color,
+                    color: "#fff",
+                    fontWeight: 600,
+                    fontSize: "0.7rem",
+                    height: 22,
+                  }}
+                />
+                <span>{chainConfig[selected as Chain].label}</span>
+              </Box>
+            )}
+          >
+            {Object.entries(chainConfig).map(([key, config]) => {
+              const isDisabled = key === "bnb" || key === "matic";
+              return (
+                <MenuItem key={key} value={key} disabled={isDisabled}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, opacity: isDisabled ? 0.4 : 1 }}>
+                    <Chip
+                      label={config.icon}
+                      size="small"
+                      sx={{
+                        backgroundColor: config.color,
+                        color: "#fff",
+                        fontWeight: 600,
+                        fontSize: "0.7rem",
+                        height: 22,
+                        minWidth: 50,
+                      }}
+                    />
+                    <span>{config.label}</span>
+                    {isDisabled && <span style={{ fontSize: "0.65rem", color: "#64748B" }}>(API payante)</span>}
+                  </Box>
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </FormControl>
 
-      <FormControl className={styles.depthSelect} size="small">
-        <InputLabel>Chain</InputLabel>
-        <Select
-          value={value.chain}
-          label="Chain"
-          onChange={handleChainChange}
+        {/* Address Input */}
+        <TextField
+          error={validateWalletInput(value.address)}
+          placeholder={`Enter ${currentChain.label} wallet address`}
+          value={value.address}
+          onChange={handleAddressChange}
+          className={styles.addressInput}
+          helperText={
+            validateWalletInput(value.address)
+              ? `Invalid ${currentChain.label} address format`
+              : ""
+          }
+          size="small"
           disabled={disabled}
-        >
-          <MenuItem value="tezos">Tezos</MenuItem>
-          <MenuItem value="eth">Ethereum</MenuItem>
-          <MenuItem value="bnb">BNB</MenuItem>
-          <MenuItem value="matic">Polygon</MenuItem>
-        </Select>
-      </FormControl>
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Chip
+                  label={currentChain.icon}
+                  size="small"
+                  sx={{
+                    backgroundColor: currentChain.color,
+                    color: "#fff",
+                    fontWeight: 600,
+                    fontSize: "0.65rem",
+                    height: 20,
+                  }}
+                />
+              </InputAdornment>
+            ),
+          }}
+        />
 
-      <FormControl className={styles.depthSelect} size="small">
-        <InputLabel>Depth</InputLabel>
-        <Select
-          value={value.depth}
-          label="Depth"
-          onChange={handleDepthChange}
-          disabled={disabled}
-        >
-          <MenuItem value={1}>1</MenuItem>
-          <MenuItem value={2}>2</MenuItem>
-          <MenuItem value={3}>3</MenuItem>
-          <MenuItem value={4}>4</MenuItem>
-        </Select>
-      </FormControl>
-      <FormControl className={styles.limitSelect} size="small">
-        <InputLabel>Limit</InputLabel>
-        <Select
-          value={value.limit}
-          label="Limit"
-          onChange={handleTxLimitChange}
-          disabled={disabled}
-        >
-          <MenuItem value={20}>20</MenuItem>
-          <MenuItem value={50}>50</MenuItem>
-          <MenuItem value={100}>100</MenuItem>
-          <MenuItem value={1000}>1000</MenuItem>
-        </Select>
-      </FormControl>
-      <FormControl className={styles.dateSelect}>
-        <DatePicker
-          label="From"
-          value={moment(value.from)}
-          onChange={handleDateFromChange}
-          slotProps={{ textField: { size: "small" } }}
-          disabled={disabled}
-          maxDate={maxDateTime}
-        />
-      </FormControl>
-      <FormControl className={styles.dateSelect}>
-        <DatePicker
-          label="To"
-          value={moment(value.to)}
-          onChange={handleDateToChange}
-          slotProps={{ textField: { size: "small" } }}
-          disabled={disabled}
-          minDate={minDateTime}
-        />
-      </FormControl>
+        {/* Depth Selection */}
+        <FormControl className={styles.depthSelect} size="small">
+          <InputLabel id="depth-label">Depth</InputLabel>
+          <Select
+            labelId="depth-label"
+            value={value.depth}
+            label="Depth"
+            onChange={handleDepthChange}
+            disabled={disabled}
+            MenuProps={menuProps}
+          >
+            <MenuItem value={1}>1 level</MenuItem>
+            <MenuItem value={2}>2 levels</MenuItem>
+            <MenuItem value={3}>3 levels</MenuItem>
+            <MenuItem value={4}>4 levels</MenuItem>
+          </Select>
+        </FormControl>
+
+        {/* Limit Selection */}
+        <FormControl className={styles.limitSelect} size="small">
+          <InputLabel id="limit-label">Limit</InputLabel>
+          <Select
+            labelId="limit-label"
+            value={value.limit}
+            label="Limit"
+            onChange={handleTxLimitChange}
+            disabled={disabled}
+            MenuProps={menuProps}
+          >
+            <MenuItem value={20}>20 tx</MenuItem>
+            <MenuItem value={50}>50 tx</MenuItem>
+            <MenuItem value={100}>100 tx</MenuItem>
+            <MenuItem value={1000}>1000 tx</MenuItem>
+          </Select>
+        </FormControl>
+
+        {/* Date Range */}
+        <div className={styles.dateRange}>
+          <FormControl className={styles.dateSelect}>
+            <DatePicker
+              label="From"
+              value={moment(value.from)}
+              onChange={handleDateFromChange}
+              slotProps={{
+                textField: {
+                  size: "small",
+                  className: styles.datePicker,
+                },
+              }}
+              disabled={disabled}
+              maxDate={maxDateTime}
+            />
+          </FormControl>
+          <span className={styles.dateSeparator}>to</span>
+          <FormControl className={styles.dateSelect}>
+            <DatePicker
+              label="To"
+              value={moment(value.to)}
+              onChange={handleDateToChange}
+              slotProps={{
+                textField: {
+                  size: "small",
+                  className: styles.datePicker,
+                },
+              }}
+              disabled={disabled}
+              minDate={minDateTime}
+            />
+          </FormControl>
+        </div>
+      </div>
     </div>
   );
 }
