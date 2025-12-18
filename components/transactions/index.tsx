@@ -41,8 +41,10 @@ export default function Transactions({ transactions }: Props) {
         <DataGrid
           rows={rows}
           columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5]}
+          initialState={{
+            pagination: { paginationModel: { pageSize: 5 } },
+          }}
+          pageSizeOptions={[5, 10, 25]}
           onCellDoubleClick={onDoubleClick}
         />
       </div>

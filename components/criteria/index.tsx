@@ -6,7 +6,7 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import TextField from "@mui/material/TextField";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import moment, { Moment } from "moment";
 import { ChangeEvent, useCallback, useMemo } from "react";
 
@@ -130,23 +130,23 @@ export default function Criteria({ value, onChange, disabled = false }: Props) {
         </Select>
       </FormControl>
       <FormControl className={styles.dateSelect}>
-        <DateTimePicker
+        <DatePicker
           label="From"
-          value={value.from}
+          value={moment(value.from)}
           onChange={handleDateFromChange}
-          renderInput={(params) => <TextField {...params} size="small" />}
+          slotProps={{ textField: { size: "small" } }}
           disabled={disabled}
-          maxDateTime={maxDateTime}
+          maxDate={maxDateTime}
         />
       </FormControl>
       <FormControl className={styles.dateSelect}>
-        <DateTimePicker
+        <DatePicker
           label="To"
-          value={value.to}
+          value={moment(value.to)}
           onChange={handleDateToChange}
-          renderInput={(params) => <TextField {...params} size="small" />}
+          slotProps={{ textField: { size: "small" } }}
           disabled={disabled}
-          minDateTime={minDateTime}
+          minDate={minDateTime}
         />
       </FormControl>
     </div>

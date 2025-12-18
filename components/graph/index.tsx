@@ -4,15 +4,9 @@ import { Transaction } from "../../model/transaction";
 import { WalletType } from "../../model/wallet";
 import { buildGraph, Graph, NodeGraph } from "./graph";
 
-const ForceGraph2D = dynamic(
-  () => import("react-force-graph").then((mod) => mod.ForceGraph2D),
-  { ssr: false }
-);
-
-const ForceGraph3D = dynamic(
-  () => import("react-force-graph").then((mod) => mod.ForceGraph3D),
-  { ssr: false }
-);
+const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
+  ssr: false,
+});
 
 interface Props {
   transactions: Transaction[];
