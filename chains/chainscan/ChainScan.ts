@@ -12,17 +12,20 @@ export class ChainScan implements fetcher {
     explorer: string;
   };
   private symbol: string;
+  private chainId: number;
 
   constructor(
     apiUrl: string,
     apiKey: string,
     urls: { avatar: string; explorer: string },
-    symbol: string
+    symbol: string,
+    chainId: number = 1
   ) {
     this.apiUrl = apiUrl;
     this.apiKey = apiKey;
     this.urls = urls;
     this.symbol = symbol;
+    this.chainId = chainId;
   }
 
   async get(criteria: Criteria): Promise<Transaction[]> {
@@ -33,7 +36,7 @@ export class ChainScan implements fetcher {
 
   async getTransactions(criteria: Criteria): Promise<Transaction[]> {
     const { data } = await axios.get<ApiResponse>(
-      `${this.apiUrl}/?module=account&apikey=${this.apiKey}&action=txlist&address=${criteria.address}&page=1&offset=${criteria.limit}`
+      `${this.apiUrl}?chainid=${this.chainId}&module=account&apikey=${this.apiKey}&action=txlist&address=${criteria.address}&page=1&offset=${criteria.limit}`
     );
 
     if (data.message === "NOTOK") return [];
