@@ -1,4 +1,27 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Scope
+
+![Scope - Transaction Viewer](doc/example-catv.png)
+
+## Description
+
+**Scope** est un outil de visualisation de transactions blockchain sous forme de graphe interactif en 3D. Il permet d'explorer et d'analyser les flux de transactions entre différentes adresses de portefeuilles crypto.
+
+### Fonctionnalités
+
+- **Visualisation en graphe 3D** : Les transactions sont représentées sous forme de nœuds et de liens interactifs
+- **Multi-chain** : Support de plusieurs blockchains (Tezos, Ethereum, etc.)
+- **Filtrage avancé** : Filtrez par période, profondeur d'exploration et nombre de transactions
+- **Liste des transactions** : Consultez le détail de chaque transaction dans un tableau
+- **Navigation intuitive** : Cliquez sur un nœud pour explorer ses connexions
+
+### Cas d'usage
+
+- Analyse de l'activité d'un portefeuille
+- Traçage des flux de fonds entre adresses
+- Identification des patterns de transactions
+- Audit et investigation blockchain
+
+---
 
 ## Getting Started
 
